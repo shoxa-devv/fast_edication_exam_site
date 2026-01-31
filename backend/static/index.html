@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Education - English Exam</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Initializing...</p>
+        </div>
+
+        <!-- Exam Page -->
+        <div id="exam-page" class="exam-page" style="display: none;">
+            <div class="exam-header">
+                <h1>English Language Exam</h1>
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="exam-content">
+                <div class="category-header">
+                    <h2 id="category-title">Grammar</h2>
+                    <span class="category-counter">
+                        <span id="current-category">1</span> / <span id="total-categories">4</span>
+                    </span>
+                </div>
+
+                <div class="section-container" id="section-container">
+                    <!-- Questions will be loaded here -->
+                </div>
+
+                <div class="exam-navigation">
+                    <button id="prev-button" class="nav-button prev-button" disabled>Previous</button>
+                    <button id="next-button" class="nav-button next-button">Next</button>
+                    <button id="submit-button" class="nav-button submit-button" style="display: none;">Submit Exam</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div id="results-page" class="results-page" style="display: none;">
+            <div class="results-container">
+                <div class="results-header">
+                    <h1>Exam Results</h1>
+                    <p class="results-subtitle">Your exam has been completed</p>
+                </div>
+
+                <div class="score-section">
+                    <div class="score-card">
+                        <div class="score-circle">
+                            <div class="score-value" id="score-percentage">0%</div>
+                            <div class="score-label">Completion</div>
+                        </div>
+                        <div class="score-details">
+                            <p><strong id="answered-count">0</strong> questions answered</p>
+                            <p>out of <strong id="total-questions">0</strong> total questions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ai-usage-section" style="display: none;">
+                    <div class="ai-usage-header">
+                        <div class="ai-usage-icon">⚠️</div>
+                        <h2>AI Usage Detected</h2>
+                    </div>
+                    <div class="ai-usage-warning">
+                        <p>
+                            <strong>AI assistance was detected</strong> in your exam responses. 
+                            The following sections contain AI-generated or AI-assisted content:
+                        </p>
+                    </div>
+                    <div class="ai-usage-list" id="ai-usage-list"></div>
+                    <div class="ai-usage-summary">
+                        <p><strong>Total sections with AI usage:</strong> <span id="ai-count">0</span></p>
+                        <p class="summary-note">Note: The use of AI assistance has been recorded and may affect your final grade.</p>
+                    </div>
+                </div>
+
+                <div id="no-ai-section" class="no-ai-section" style="display: none;">
+                    <div class="no-ai-icon">✅</div>
+                    <h3>No AI Usage Detected</h3>
+                    <p>Your exam was completed without AI assistance.</p>
+                </div>
+
+                <div class="results-actions">
+                    <button onclick="location.reload()" class="retake-button">Retake Exam</button>
+                    <button onclick="window.print()" class="print-button">Print Results</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
