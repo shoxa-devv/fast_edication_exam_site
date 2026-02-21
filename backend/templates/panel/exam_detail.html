@@ -1,0 +1,48 @@
+{% extends "panel/base.html" %}
+{% block title %}Exam Detail{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>Exam Detail</h1><a href="/admin/exams/" class="btn btn-sm btn-g">← Back</a></div>
+
+<div class="stats">
+  <div class="st"><div class="st-n">{{ exam.total_score|floatformat:0 }} / {{ exam.max_score|floatformat:0 }}</div><div class="st-l">Score</div></div>
+  <div class="st"><div class="st-n">{{ answers.count }}</div><div class="st-l">Answers</div></div>
+  <div class="st"><div class="st-n" style="color:{% if ai_usage.count > 0 %}#f87171{% else %}#34d399{% endif %}">{{ ai_usage.count }}</div><div class="st-l">AI Flagged</div></div>
+</div>
+
+<div style="font-size:16px;font-weight:700;margin-bottom:14px">Answers</div>
+<div class="tw" style="margin-bottom:28px">
+<table>
+<thead><tr><th>Category</th><th>Question</th><th>Answer</th><th>Result</th><th>Pts</th></tr></thead>
+<tbody>
+{% for a in answers %}
+<tr>
+  <td><span class="badge bg-blue">{{ a.question.category.name }}</span></td>
+  <td>{{ a.question.question_text|truncatechars:45 }}</td>
+  <td>{% if a.answer_index is not None %}Option {{ a.answer_index }}{% else %}{{ a.answer_text|truncatechars:35 }}{% endif %}</td>
+  <td>{% if a.is_correct %}<span class="badge bg-green">✓ Correct</span>{% elif a.is_correct == False %}<span class="badge bg-red">✗ Wrong</span>{% else %}<span class="badge bg-gray">Manual</span>{% endif %}</td>
+  <td>{{ a.points_earned|floatformat:0 }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+{% if ai_usage.count > 0 %}
+<div style="font-size:16px;font-weight:700;color:#f87171;margin-bottom:14px">⚠ AI Usage Detected</div>
+<div class="tw">
+<table>
+<thead><tr><th>Question</th><th>Confidence</th><th>Patterns</th><th>Snippet</th></tr></thead>
+<tbody>
+{% for ai in ai_usage %}
+<tr>
+  <td>{{ ai.question.question_text|truncatechars:35 }}</td>
+  <td><span class="badge bg-yellow">{{ ai.confidence_score|floatformat:1 }}%</span></td>
+  <td style="font-size:12px;color:#94a3b8">{{ ai.detected_patterns|join:", " }}</td>
+  <td style="max-width:250px;font-size:12px;color:#64748b">{{ ai.text_snippet|truncatechars:80 }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+{% endblock %}

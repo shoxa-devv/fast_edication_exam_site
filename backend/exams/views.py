@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 import json
 import uuid
+import random
 from datetime import datetime
 from .models import Category, Question, ExamSession, Answer, AIUsage
 from .ai_detector import AdvancedAIDetector
@@ -43,12 +44,29 @@ def get_questions(request):
     """Get questions for a specific category"""
     category_slug = request.GET.get('category', '')
     
+    # How many questions per category to show per session
+    LIMITS = {
+        'grammar': 10,
+        'vocabulary': 10,
+        'translation': 5,
+        'writing': 2,  # essays stay fixed (not randomized)
+    }
+
     try:
         if category_slug:
             category = Category.objects.get(slug=category_slug, is_active=True)
-            questions = Question.objects.filter(category=category, is_active=True).order_by('order', 'id')
+            all_qs = list(Question.objects.filter(category=category, is_active=True))
+            
+            limit = LIMITS.get(category_slug, 10)
+            
+            if category_slug == 'writing':
+                # Essays: pick random subset but don't shuffle on every call
+                questions = random.sample(all_qs, min(limit, len(all_qs)))
+            else:
+                # Grammar/Vocab/Translation: fully random each time
+                questions = random.sample(all_qs, min(limit, len(all_qs)))
         else:
-            questions = Question.objects.filter(is_active=True).order_by('category', 'order', 'id')
+            questions = list(Question.objects.filter(is_active=True).order_by('?')[:30])
         
         data = []
         for q in questions:
@@ -62,7 +80,7 @@ def get_questions(request):
                 'points': q.points,
             }
             
-            if q.question_type == 'multiple_choice' or q.question_type == 'vocabulary':
+            if q.question_type in ('multiple_choice', 'vocabulary'):
                 question_data['options'] = q.options or []
                 question_data['correct_answer_index'] = q.correct_answer_index
             
@@ -87,7 +105,7 @@ def detect_ai(request):
         question_id = data.get('questionId')
         category = data.get('category', 'writing')
         
-        if not text or len(text) < 50:
+        if not text or len(text) < 30:
             return JsonResponse({
                 'success': True,
                 'ai_used': False,
@@ -102,6 +120,7 @@ def detect_ai(request):
             'ai_used': result['is_ai_used'],
             'confidence': result['confidence'],
             'detected_patterns': result['patterns'],
+            'detection_type': result.get('detection_type', 'none'),
             'questionId': question_id,
             'category': category,
             'text_length': len(text)
@@ -179,16 +198,19 @@ def submit_exam(request):
                 question = Question.objects.get(id=question_id, is_active=True)
                 max_score += question.points
                 
-                # Check if answer is correct
-                is_correct = None
+                # Check if answer is correct — STRICTLY compare
+                is_correct = False
                 points_earned = 0
                 
                 if question.question_type in ['multiple_choice', 'vocabulary']:
-                    if answer_value == question.correct_answer_index:
+                    if question.correct_answer_index is not None and answer_value == question.correct_answer_index:
                         is_correct = True
                         points_earned = question.points
                         total_score += question.points
-                # For translation and writing, we don't auto-grade
+                    else:
+                        is_correct = False
+                        points_earned = 0
+                # Translation and writing are not auto-graded (is_correct stays False)
                 
                 Answer.objects.create(
                     exam_session=exam_session,
@@ -229,7 +251,8 @@ def submit_exam(request):
                         'questionId': question_id,
                         'used': True,
                         'text': text[:200],
-                        'confidence': result['confidence']
+                        'confidence': result['confidence'],
+                        'detection_type': result.get('detection_type', 'generated')
                     }
             except (ValueError, Question.DoesNotExist):
                 continue
@@ -238,16 +261,54 @@ def submit_exam(request):
         exam_session.max_score = max_score
         exam_session.save()
         
+        # Count correct answers for multiple_choice and vocabulary only
+        correct_count = exam_session.answers.filter(is_correct=True).count()
+        total_gradable = exam_session.answers.filter(
+            question__question_type__in=['multiple_choice', 'vocabulary']
+        ).count()
+        
+        # Build detailed review data for each question
+        review = []
+        for answer in exam_session.answers.select_related('question', 'question__category').order_by('question__category__order', 'question__order'):
+            q = answer.question
+            item = {
+                'questionId': q.id,
+                'category': q.category.slug,
+                'categoryName': q.category.name,
+                'questionType': q.question_type,
+                'questionText': q.question_text,
+                'instructions': q.instructions,
+                'isCorrect': answer.is_correct,
+            }
+            
+            if q.question_type in ('multiple_choice', 'vocabulary'):
+                item['options'] = q.options or []
+                item['correctIndex'] = q.correct_answer_index
+                item['correctAnswer'] = q.options[q.correct_answer_index] if q.options and q.correct_answer_index is not None and q.correct_answer_index < len(q.options) else ''
+                item['yourAnswer'] = q.options[answer.answer_index] if answer.answer_index is not None and q.options and answer.answer_index < len(q.options) else 'No answer'
+                item['yourIndex'] = answer.answer_index
+            elif q.question_type == 'translation':
+                item['yourAnswer'] = answer.answer_text or 'No answer'
+                item['correctAnswer'] = ''  # Translation is manually graded
+            elif q.question_type == 'writing':
+                item['yourAnswer'] = answer.answer_text or 'No answer'
+                item['correctAnswer'] = ''
+            
+            review.append(item)
+        
         return JsonResponse({
             'success': True,
             'examId': session_id,
             'aiUsageSummary': ai_usage_summary,
             'totalAiUsed': len(ai_usage_summary),
             'score': {
-                'total': total_score,
-                'max': max_score,
-                'percentage': round((total_score / max_score * 100) if max_score > 0 else 0, 2)
+                'correct': correct_count,
+                'total': total_gradable,
+                'points': total_score,
+                'maxPoints': max_score,
+                'percentage': round((correct_count / total_gradable * 100) if total_gradable > 0 else 0, 2)
             },
+            'review': review,
             'message': 'Exam submitted successfully'
         })
     except Exception as e:

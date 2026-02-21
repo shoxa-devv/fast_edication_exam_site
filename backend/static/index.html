@@ -1,99 +1,130 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Education - English Exam</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fast Education — English Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div id="app">
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="loading-container">
-            <div class="loading-spinner"></div>
-            <p>Initializing...</p>
-        </div>
 
-        <!-- Exam Page -->
-        <div id="exam-page" class="exam-page" style="display: none;">
-            <div class="exam-header">
-                <h1>English Language Exam</h1>
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
+<!-- 1 · WELCOME -->
+<section id="v-welcome" class="scene on">
+  <div class="glass-card welcome-box">
+    <div class="icon-circle"><svg width="32" height="32" fill="none" stroke="#6366f1" stroke-width="1.6" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div>
+    <h1>Fast Education</h1>
+    <p class="muted">English Language Proficiency Exam</p>
+    <input id="inp-name" class="field" type="text" placeholder="Enter your full name" autocomplete="off">
+    <button id="btn-go" class="btn btn-lg btn-grad" disabled>Start Exam →</button>
+  </div>
+</section>
 
-            <div class="exam-content">
-                <div class="category-header">
-                    <h2 id="category-title">Grammar</h2>
-                    <span class="category-counter">
-                        <span id="current-category">1</span> / <span id="total-categories">4</span>
-                    </span>
-                </div>
+<!-- 2 · OVERVIEW -->
+<section id="v-overview" class="scene">
+  <div class="glass-card overview-box">
+    <div class="icon-circle"><svg width="32" height="32" fill="none" stroke="#6366f1" stroke-width="1.6" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div>
+    <h1>Test Overview</h1>
+    <p class="muted">This exam has the following sections</p>
+    <div id="ov-list" class="ov-list"></div>
+    <div class="ov-meta"><span id="ov-count">0 questions</span><span>≈ 30 min</span></div>
+    <button id="btn-begin" class="btn btn-lg btn-grad">Begin Test →</button>
+  </div>
+</section>
 
-                <div class="section-container" id="section-container">
-                    <!-- Questions will be loaded here -->
-                </div>
+<!-- 3 · SECTION COMPLETE -->
+<section id="v-section" class="scene">
+  <div class="glass-card overview-box">
+    <h1>Section Complete!</h1>
+    <p class="muted" id="sec-msg">You've finished the Grammar section.</p>
+    <div id="sec-list" class="ov-list"></div>
+    <button id="btn-continue" class="btn btn-lg btn-grad">Continue to Next Section →</button>
+  </div>
+</section>
 
-                <div class="exam-navigation">
-                    <button id="prev-button" class="nav-button prev-button" disabled>Previous</button>
-                    <button id="next-button" class="nav-button next-button">Next</button>
-                    <button id="submit-button" class="nav-button submit-button" style="display: none;">Submit Exam</button>
-                </div>
-            </div>
-        </div>
+<!-- 4 · EXAM -->
+<section id="v-exam" class="scene">
+  <header class="bar">
+    <div class="bar-brand">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      Fast Education
+    </div>
+    <div class="bar-progress"><div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div></div>
+    <div class="bar-meta">
+      <span id="user-lbl" class="bar-user"></span>
+      <span class="bar-timer">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <b id="timer-t">00:00</b>
+      </span>
+    </div>
+  </header>
+  <main class="stage">
+    <div class="q-card" id="q-card">
+      <span class="q-tag" id="q-tag"></span>
+      <p class="q-sub" id="q-sub"></p>
+      <h2 class="q-title" id="q-title"></h2>
+      <div id="q-body"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="nav-prev" disabled>← Previous</button>
+      <button class="btn btn-grad" id="nav-next">Next →</button>
+      <button class="btn btn-green" id="nav-submit" hidden>Submit Exam ✓</button>
+    </div>
+  </main>
+  <footer class="dots-bar" id="dots-bar"></footer>
+</section>
 
-        <!-- Results Page -->
-        <div id="results-page" class="results-page" style="display: none;">
-            <div class="results-container">
-                <div class="results-header">
-                    <h1>Exam Results</h1>
-                    <p class="results-subtitle">Your exam has been completed</p>
-                </div>
+<!-- 5 · RESULTS -->
+<section id="v-results" class="scene">
+  <div class="result-box">
+    <h1>Exam Complete</h1>
+    <p class="muted" id="res-name"></p>
 
-                <div class="score-section">
-                    <div class="score-card">
-                        <div class="score-circle">
-                            <div class="score-value" id="score-percentage">0%</div>
-                            <div class="score-label">Completion</div>
-                        </div>
-                        <div class="score-details">
-                            <p><strong id="answered-count">0</strong> questions answered</p>
-                            <p>out of <strong id="total-questions">0</strong> total questions</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="ai-usage-section" style="display: none;">
-                    <div class="ai-usage-header">
-                        <div class="ai-usage-icon">⚠️</div>
-                        <h2>AI Usage Detected</h2>
-                    </div>
-                    <div class="ai-usage-warning">
-                        <p>
-                            <strong>AI assistance was detected</strong> in your exam responses. 
-                            The following sections contain AI-generated or AI-assisted content:
-                        </p>
-                    </div>
-                    <div class="ai-usage-list" id="ai-usage-list"></div>
-                    <div class="ai-usage-summary">
-                        <p><strong>Total sections with AI usage:</strong> <span id="ai-count">0</span></p>
-                        <p class="summary-note">Note: The use of AI assistance has been recorded and may affect your final grade.</p>
-                    </div>
-                </div>
-
-                <div id="no-ai-section" class="no-ai-section" style="display: none;">
-                    <div class="no-ai-icon">✅</div>
-                    <h3>No AI Usage Detected</h3>
-                    <p>Your exam was completed without AI assistance.</p>
-                </div>
-
-                <div class="results-actions">
-                    <button onclick="location.reload()" class="retake-button">Retake Exam</button>
-                    <button onclick="window.print()" class="print-button">Print Results</button>
-                </div>
-            </div>
-        </div>
+    <div class="ring-wrap">
+      <div class="ring" id="ring"><span class="ring-val" id="ring-val">0%</span><span class="ring-lbl">Score</span></div>
+      <div class="ring-stats">
+        <div><b id="rs-correct">0</b><small>Correct</small></div>
+        <div><b id="rs-total">0</b><small>Gradable</small></div>
+        <div><b id="rs-time">00:00</b><small>Time</small></div>
+      </div>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <div id="ai-box" class="ai-box" hidden>
+      <div class="ai-title">⚠️ AI Usage Detected</div>
+      <div id="ai-list"></div>
+      <p class="ai-note">This has been recorded and may affect your grade.</p>
+    </div>
+    <div id="clean-box" class="clean-box" hidden>
+      ✅ <strong>No AI usage detected</strong> — All work appears to be your own.
+    </div>
+
+    <!-- Review buttons per category -->
+    <div class="review-tabs" id="review-tabs"></div>
+
+    <!-- Detailed review -->
+    <div id="review-area"></div>
+
+    <div class="res-btns">
+      <button class="btn btn-grad" onclick="location.reload()">Take Again</button>
+      <button class="btn btn-ghost" onclick="window.print()">Print Results</button>
+    </div>
+  </div>
+</section>
+
+<!-- Review Modal -->
+<div id="review-modal" class="modal" hidden>
+  <div class="modal-content">
+    <div class="modal-head">
+      <h2 id="modal-title">Grammar Review</h2>
+      <p class="muted" id="modal-sub">A detailed review of your answers.</p>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,18 @@
+{% extends "panel/base.html" %}
+{% block title %}{% if category %}Edit{% else %}Add{% endif %} Category{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>{% if category %}Edit {{ category.name }}{% else %}New Category{% endif %}</h1></div>
+<div class="fcard">
+<form method="post">{% csrf_token %}
+  <div class="fg"><label>Name</label><input name="name" class="fc" value="{{ category.name|default:"" }}" required></div>
+  <div class="fg"><label>Slug</label><input name="slug" class="fc" value="{{ category.slug|default:"" }}" required></div>
+  <div class="fg"><label>Description</label><textarea name="description" class="fc" rows="2">{{ category.description|default:"" }}</textarea></div>
+  <div class="fg"><label>Order</label><input type="number" name="order" class="fc" value="{{ category.order|default:0 }}"></div>
+  <div class="fg"><label class="fcheck"><input type="checkbox" name="is_active" {% if category.is_active or not category %}checked{% endif %}> Active</label></div>
+  <div style="display:flex;gap:12px">
+    <button type="submit" class="btn btn-p">{% if category %}Save{% else %}Create{% endif %}</button>
+    <a href="/admin/categories/" class="btn btn-g">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}

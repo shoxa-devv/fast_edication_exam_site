@@ -1,18 +1,16 @@
-"""
-URL configuration for exam_site project.
-"""
-from django.contrib import admin
+"""URL configuration for exam_site project."""
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import redirect
+from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', include('exams.admin_urls')),
     path('api/', include('exams.urls')),
-    path('', lambda request: redirect('/static/index.html')),
+    path('', TemplateView.as_view(template_name='index.html')),
 ]
 
+# In DEBUG mode, django.contrib.staticfiles handles /static/ automatically
+# from STATICFILES_DIRS. Only add media serving.
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

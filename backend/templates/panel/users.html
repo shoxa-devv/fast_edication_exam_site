@@ -1,0 +1,21 @@
+{% extends "panel/base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>Users</h1></div>
+<div class="tw">
+<table>
+<thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Exams</th><th>Joined</th></tr></thead>
+<tbody>
+{% for item in users %}
+<tr>
+  <td style="font-weight:600;color:#fff">{{ item.user.username }}</td>
+  <td style="color:#94a3b8">{{ item.user.email|default:"—" }}</td>
+  <td>{% if item.user.is_staff %}<span class="badge bg-blue">Admin</span>{% else %}<span class="badge bg-gray">User</span>{% endif %}</td>
+  <td>{{ item.exam_count }}</td>
+  <td style="color:#64748b">{{ item.user.date_joined|date:"M d, Y" }}</td>
+</tr>
+{% empty %}<tr><td colspan="5" class="empty">No users</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

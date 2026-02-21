@@ -1,0 +1,37 @@
+{% extends "panel/base.html" %}
+{% block title %}Questions{% endblock %}
+{% block content %}
+<div class="page-hd">
+  <h1>Questions</h1>
+  <a href="/admin/questions/add/" class="btn btn-p">+ Add Question</a>
+</div>
+
+<div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+  <a href="/admin/questions/" class="btn btn-sm {% if not current_cat %}btn-p{% else %}btn-g{% endif %}">All</a>
+  {% for c in categories %}
+  <a href="/admin/questions/?category={{ c.slug }}" class="btn btn-sm {% if current_cat == c.slug %}btn-p{% else %}btn-g{% endif %}">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="tw">
+<table>
+<thead><tr><th>#</th><th>Category</th><th>Type</th><th>Question</th><th>Pts</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody>
+{% for q in questions %}
+<tr>
+  <td style="color:#64748b">{{ q.id }}</td>
+  <td><span class="badge bg-blue">{{ q.category.name }}</span></td>
+  <td style="color:#94a3b8">{{ q.question_type }}</td>
+  <td style="max-width:280px">{{ q.question_text|truncatechars:55 }}</td>
+  <td>{{ q.points }}</td>
+  <td>{% if q.is_active %}<span class="badge bg-green">Active</span>{% else %}<span class="badge bg-gray">Off</span>{% endif %}</td>
+  <td class="acell">
+    <a href="/admin/questions/{{ q.pk }}/edit/" class="btn btn-sm btn-g">Edit</a>
+    <a href="/admin/questions/{{ q.pk }}/delete/" class="btn btn-sm btn-d" onclick="return confirm('Delete?')">Del</a>
+  </td>
+</tr>
+{% empty %}<tr><td colspan="7" class="empty">No questions</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

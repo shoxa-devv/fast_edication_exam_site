@@ -1,0 +1,31 @@
+{% extends "panel/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>Dashboard</h1></div>
+
+<div class="stats">
+  <div class="st"><div class="st-n">{{ total_questions }}</div><div class="st-l">Active Questions</div></div>
+  <div class="st"><div class="st-n">{{ total_categories }}</div><div class="st-l">Categories</div></div>
+  <div class="st"><div class="st-n">{{ total_exams }}</div><div class="st-l">Exam Sessions</div></div>
+  <div class="st"><div class="st-n">{{ total_users }}</div><div class="st-l">Users</div></div>
+  <div class="st"><div class="st-n" style="color:#f87171">{{ ai_flagged }}</div><div class="st-l">AI Flagged</div></div>
+</div>
+
+<div class="page-hd" style="margin-top:8px"><h1 style="font-size:16px">Recent Exams</h1></div>
+<div class="tw">
+<table>
+<thead><tr><th>Session</th><th>Status</th><th>Score</th><th>AI</th><th>Date</th></tr></thead>
+<tbody>
+{% for e in recent_exams %}
+<tr>
+  <td><a href="/admin/exams/{{ e.pk }}/" style="color:#a78bfa;font-weight:600">{{ e.session_id|truncatechars:16 }}</a></td>
+  <td>{% if e.is_completed %}<span class="badge bg-green">Done</span>{% else %}<span class="badge bg-gray">Pending</span>{% endif %}</td>
+  <td>{% if e.max_score > 0 %}{{ e.total_score|floatformat:0 }}/{{ e.max_score|floatformat:0 }}{% else %}—{% endif %}</td>
+  <td>{% with c=e.ai_usage.count %}{% if c > 0 %}<span class="badge bg-red">⚠ {{ c }}</span>{% else %}<span class="badge bg-green">✓</span>{% endif %}{% endwith %}</td>
+  <td style="color:#64748b">{{ e.started_at|date:"M d, H:i" }}</td>
+</tr>
+{% empty %}<tr><td colspan="5" class="empty">No exams yet</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

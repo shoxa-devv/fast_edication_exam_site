@@ -1,0 +1,23 @@
+{% extends "panel/base.html" %}
+{% block title %}Exam Results{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>Exam Results</h1></div>
+<div class="tw">
+<table>
+<thead><tr><th>#</th><th>Session</th><th>Status</th><th>Score</th><th>AI</th><th>Date</th><th></th></tr></thead>
+<tbody>
+{% for e in exams %}
+<tr>
+  <td style="color:#64748b">{{ e.pk }}</td>
+  <td style="font-family:monospace;font-size:12px;color:#94a3b8">{{ e.session_id|truncatechars:20 }}</td>
+  <td>{% if e.is_completed %}<span class="badge bg-green">Done</span>{% else %}<span class="badge bg-gray">Pending</span>{% endif %}</td>
+  <td>{% if e.max_score > 0 %}{{ e.total_score|floatformat:0 }}/{{ e.max_score|floatformat:0 }}{% else %}—{% endif %}</td>
+  <td>{% with c=e.ai_usage.count %}{% if c > 0 %}<span class="badge bg-red">⚠ {{ c }}</span>{% else %}<span class="badge bg-green">✓</span>{% endif %}{% endwith %}</td>
+  <td style="color:#64748b">{{ e.started_at|date:"M d, H:i" }}</td>
+  <td><a href="/admin/exams/{{ e.pk }}/" class="btn btn-sm btn-g">View</a></td>
+</tr>
+{% empty %}<tr><td colspan="7" class="empty">No exams yet</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

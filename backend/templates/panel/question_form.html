@@ -1,0 +1,51 @@
+{% extends "panel/base.html" %}
+{% block title %}{% if question %}Edit{% else %}Add{% endif %} Question{% endblock %}
+{% block content %}
+<div class="page-hd"><h1>{% if question %}Edit Question #{{ question.id }}{% else %}New Question{% endif %}</h1></div>
+
+<div class="fcard">
+<form method="post">{% csrf_token %}
+  <div class="fg"><label>Category</label>
+    <select name="category" class="fc" required>
+      {% for c in categories %}<option value="{{ c.id }}" {% if question and question.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select></div>
+
+  <div class="fg"><label>Type</label>
+    <select name="question_type" class="fc" required>
+      <option value="multiple_choice" {% if question.question_type == 'multiple_choice' %}selected{% endif %}>Multiple Choice</option>
+      <option value="vocabulary" {% if question.question_type == 'vocabulary' %}selected{% endif %}>Vocabulary</option>
+      <option value="translation" {% if question.question_type == 'translation' %}selected{% endif %}>Translation</option>
+      <option value="writing" {% if question.question_type == 'writing' %}selected{% endif %}>Writing</option>
+    </select></div>
+
+  <div class="fg"><label>Question Text</label>
+    <textarea name="question_text" class="fc" rows="3" required>{{ question.question_text|default:"" }}</textarea></div>
+
+  <div class="fg"><label>Instructions</label>
+    <textarea name="instructions" class="fc" rows="2">{{ question.instructions|default:"" }}</textarea></div>
+
+  <div style="padding:16px 0 8px;font-size:13px;font-weight:600;color:#a78bfa">Options (for multiple choice / vocabulary)</div>
+  {% for i in "0123" %}
+  <div class="fg" style="margin-bottom:8px">
+    <input name="option_{{ forloop.counter0 }}" class="fc" placeholder="Option {{ forloop.counter }}"
+      value="{% if question and question.options and question.options|length > forloop.counter0 %}{% with idx=forloop.counter0 %}{% if idx == 0 %}{{ question.options.0 }}{% elif idx == 1 %}{{ question.options.1 }}{% elif idx == 2 %}{{ question.options.2 }}{% elif idx == 3 %}{{ question.options.3 }}{% endif %}{% endwith %}{% endif %}">
+  </div>{% endfor %}
+
+  <div class="fg"><label>Correct Answer Index (0-based)</label>
+    <input type="number" name="correct_answer_index" class="fc" min="0" max="5" value="{{ question.correct_answer_index|default:"" }}"></div>
+
+  <div style="display:flex;gap:14px">
+    <div class="fg" style="flex:1"><label>Points</label><input type="number" name="points" class="fc" value="{{ question.points|default:1 }}" min="1"></div>
+    <div class="fg" style="flex:1"><label>Min Words</label><input type="number" name="min_words" class="fc" value="{{ question.min_words|default:0 }}"></div>
+    <div class="fg" style="flex:1"><label>Order</label><input type="number" name="order" class="fc" value="{{ question.order|default:0 }}"></div>
+  </div>
+
+  <div class="fg"><label class="fcheck"><input type="checkbox" name="is_active" {% if question.is_active or not question %}checked{% endif %}> Active</label></div>
+
+  <div style="display:flex;gap:12px">
+    <button type="submit" class="btn btn-p">{% if question %}Save{% else %}Create{% endif %}</button>
+    <a href="/admin/questions/" class="btn btn-g">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}
