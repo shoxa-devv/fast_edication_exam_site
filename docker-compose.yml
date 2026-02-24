@@ -2,11 +2,18 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "80:8000"
     volumes:
-      - ./backend:/app
+      - sqlite_data:/app/data
+      - static_files:/app/staticfiles
+      - media_files:/app/media
     environment:
       - DJANGO_SETTINGS_MODULE=exam_site.settings
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
+
+volumes:
+  sqlite_data:
+  static_files:
+  media_files:
