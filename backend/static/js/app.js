@@ -52,11 +52,14 @@ async function doRegister() {
   try {
     $('btn-register').disabled = true;
     $('btn-register').textContent = 'Yuklanmoqda... / Загрузка...';
-    const r = await (await fetch(`${API}/register/`, {
+    const resp = await fetch(`${API}/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    })).json();
+    });
+    const text = await resp.text();
+    let r;
+    try { r = JSON.parse(text); } catch { r = { success: false, error: 'Server javob bermadi. BACKEND_URL o\'rnatilganmi? Netlify → Site configuration → Environment variables → BACKEND_URL = Django sayt manzili.' }; }
     if (r.success) {
       studentId = r.student_id;
       studentName = r.student_name;
@@ -67,8 +70,8 @@ async function doRegister() {
       $('btn-register').disabled = false;
       $('btn-register').innerHTML = "Boshlash / Начать";
     }
-  } catch {
-    alert('Server bilan bog\'lanib bo\'lmadi / Ошибка соединения');
+  } catch (e) {
+    alert('Server bilan bog\'lanib bo\'lmadi / Ошибка соединения.\n\nNetlify: BACKEND_URL o\'rnating (Django sayt manzili).\nYoki Django backendni Railway/Render da ishga tushiring.');
     $('btn-register').disabled = false;
     $('btn-register').innerHTML = "Boshlash / Начать";
   }

@@ -22,8 +22,9 @@ sed -e "s|{% load static %}||g" \
     -e "s|{% static 'images/levels/\([^']*\)' %}|/images/levels/\1|g" \
     "$STATIC/index.html" > "$PUBLIC/index.html"
 
-# SPA fallback: all routes -> index.html
-echo "/*    /index.html   200" > "$PUBLIC/_redirects"
+# SPA fallback: /api/* -> proxy, everything else -> index.html
+# Order matters: first matching rule wins
+printf '%s\n' '/api/*  /.netlify/functions/api-proxy?path=:splat  200' '/*  /index.html  200' > "$PUBLIC/_redirects"
 
 echo "Build complete: $PUBLIC"
 ls -la "$PUBLIC"
