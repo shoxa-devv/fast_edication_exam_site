@@ -2,7 +2,7 @@ services:
   web:
     build: .
     ports:
-      - "80:8000"
+      - "8080:8000"
     volumes:
       - sqlite_data:/app/data
       - static_files:/app/staticfiles

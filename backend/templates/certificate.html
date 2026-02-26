@@ -1,0 +1,293 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Certificate — {{ student.full_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0F172A;--navy-mid:#1E293B;--accent:#6366F1;
+  --gold:#C9A84C;--gold-light:#E8D48B;
+  --cream:#FAFAF8;--white:#fff;
+  --g200:#E2E8F0;--g300:#CBD5E1;--g400:#94A3B8;--g500:#64748B;--g700:#334155;--g900:#0F172A;
+}
+@page{size:A4 landscape;margin:0}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#E2E8F0;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.cert-page{
+  width:1050px;height:730px;
+  background:var(--white);
+  position:relative;overflow:hidden;
+  box-shadow:0 25px 60px rgba(0,0,0,.12);
+}
+@media print{
+  body{background:#fff;padding:0}
+  .cert-page{box-shadow:none;width:100%;height:100vh}
+  .no-print{display:none!important}
+}
+
+/* Border frame */
+.cert-border{
+  position:absolute;inset:12px;
+  border:2px solid var(--gold);
+  pointer-events:none;z-index:2;
+}
+.cert-border::before{
+  content:'';position:absolute;inset:4px;
+  border:1px solid rgba(201,168,76,.3);
+}
+
+/* Corner ornaments */
+.corner{position:absolute;width:60px;height:60px;z-index:3;pointer-events:none}
+.corner svg{width:100%;height:100%}
+.corner-tl{top:14px;left:14px}
+.corner-tr{top:14px;right:14px;transform:scaleX(-1)}
+.corner-bl{bottom:14px;left:14px;transform:scaleY(-1)}
+.corner-br{bottom:14px;right:14px;transform:scale(-1)}
+
+/* Layout */
+.cert-inner{
+  position:relative;z-index:4;
+  display:flex;flex-direction:column;
+  height:100%;padding:40px 56px 32px;
+}
+
+/* Top header row */
+.cert-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.cert-logo{display:flex;align-items:center;gap:14px}
+.cert-logo img{width:48px;height:48px;object-fit:contain;border-radius:8px}
+.cert-logo-text{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.02em}
+.cert-id{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--g400);text-align:right;line-height:1.6}
+
+/* Title */
+.cert-title-area{text-align:center;margin:12px 0 6px}
+.cert-of{
+  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:4px;color:var(--gold);
+  margin-bottom:4px;
+}
+.cert-title{
+  font-family:'Playfair Display',serif;
+  font-size:38px;font-weight:700;
+  color:var(--navy);letter-spacing:-.02em;
+  line-height:1.15;
+}
+.cert-subtitle{
+  font-size:13px;color:var(--g500);margin-top:6px;
+  letter-spacing:.5px;
+}
+
+/* Horizontal divider */
+.gold-line{
+  width:120px;height:2px;margin:14px auto;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+
+/* Name section */
+.cert-name-area{text-align:center;margin:4px 0 12px}
+.cert-label{font-size:11px;color:var(--g400);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.cert-student-name{
+  font-family:'Playfair Display',serif;font-size:32px;font-weight:700;
+  color:var(--navy);letter-spacing:-.01em;
+  border-bottom:2px solid var(--gold-light);
+  display:inline-block;padding:0 40px 4px;
+}
+
+/* Results grid */
+.cert-results{
+  display:flex;align-items:stretch;justify-content:center;gap:0;
+  margin:16px 0 12px;
+}
+.cert-score-block{
+  text-align:center;padding:16px 28px;
+  border-right:1px solid var(--g200);
+  flex:1;max-width:180px;
+}
+.cert-score-block:last-child{border-right:none}
+.cert-score-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--g400);margin-bottom:6px;font-weight:600}
+.cert-score-val{
+  font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;
+  color:var(--navy);letter-spacing:-.02em;
+}
+.cert-score-val.band{color:var(--accent);font-size:36px}
+.cert-score-sub{font-size:11px;color:var(--g500);margin-top:2px;font-weight:500}
+
+/* Category breakdown */
+.cert-cats{
+  display:flex;justify-content:center;gap:8px;
+  margin:6px 0 14px;flex-wrap:wrap;
+}
+.cert-cat{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:20px;
+  background:#F8FAFC;border:1px solid var(--g200);
+  font-size:11px;font-weight:600;color:var(--g700);
+}
+.cert-cat-score{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;color:var(--accent);
+}
+
+/* Bottom section */
+.cert-bottom{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-top:auto;
+}
+.cert-sign{text-align:center;min-width:180px}
+.cert-sign-line{width:160px;height:1px;background:var(--g300);margin:0 auto 6px}
+.cert-sign-title{font-size:11px;color:var(--g400);font-weight:600}
+.cert-date{text-align:center}
+.cert-date-val{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--navy)}
+.cert-date-lbl{font-size:10px;color:var(--g400);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+.cert-stamp{text-align:center}
+.cert-stamp img{width:72px;height:72px;object-fit:contain;opacity:.7}
+.cert-stamp-text{
+  font-size:9px;color:var(--g400);text-transform:uppercase;
+  letter-spacing:1px;margin-top:2px;
+}
+
+/* Watermark */
+.cert-watermark{
+  position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);
+  font-family:'Playfair Display',serif;font-size:130px;font-weight:800;
+  color:rgba(99,102,241,.03);pointer-events:none;z-index:1;
+  letter-spacing:8px;white-space:nowrap;
+}
+
+/* Print button */
+.print-bar{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;gap:10px;
+}
+.print-bar button{
+  padding:12px 28px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.btn-print{background:var(--navy);color:#fff}
+.btn-print:hover{background:var(--accent);transform:translateY(-2px);box-shadow:0 8px 20px rgba(99,102,241,.3)}
+.btn-back{background:var(--white);color:var(--g700);border:1.5px solid var(--g200)!important}
+.btn-back:hover{border-color:var(--g300)!important;color:var(--navy)}
+</style>
+</head>
+<body>
+
+<div class="cert-page">
+  <div class="cert-border"></div>
+  <div class="cert-watermark">FE</div>
+
+  <!-- Corner ornaments -->
+  <div class="corner corner-tl"><svg viewBox="0 0 60 60" fill="none"><path d="M0 0h60v8H8v52H0z" fill="#C9A84C" opacity=".5"/><path d="M4 4h52v4H12v48H4z" fill="#C9A84C" opacity=".25"/></svg></div>
+  <div class="corner corner-tr"><svg viewBox="0 0 60 60" fill="none"><path d="M0 0h60v8H8v52H0z" fill="#C9A84C" opacity=".5"/><path d="M4 4h52v4H12v48H4z" fill="#C9A84C" opacity=".25"/></svg></div>
+  <div class="corner corner-bl"><svg viewBox="0 0 60 60" fill="none"><path d="M0 0h60v8H8v52H0z" fill="#C9A84C" opacity=".5"/><path d="M4 4h52v4H12v48H4z" fill="#C9A84C" opacity=".25"/></svg></div>
+  <div class="corner corner-br"><svg viewBox="0 0 60 60" fill="none"><path d="M0 0h60v8H8v52H0z" fill="#C9A84C" opacity=".5"/><path d="M4 4h52v4H12v48H4z" fill="#C9A84C" opacity=".25"/></svg></div>
+
+  <div class="cert-inner">
+    <!-- Header -->
+    <div class="cert-top">
+      <div class="cert-logo">
+        <img src="{{ logo_url }}" alt="FE">
+        <span class="cert-logo-text">Fast Education</span>
+      </div>
+      <div class="cert-id">
+        Ref: {{ exam.session_id|truncatechars:14 }}<br>
+        {{ exam.level.name }} · {{ exam.month.name }}
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="cert-title-area">
+      <div class="cert-of">Certificate</div>
+      <div class="cert-title">English Language Proficiency</div>
+      <div class="cert-subtitle">Assessment Result / Baholash natijasi / Результат оценки</div>
+    </div>
+
+    <div class="gold-line"></div>
+
+    <!-- Student name -->
+    <div class="cert-name-area">
+      <div class="cert-label">This certifies that / Ushbu sertifikat tasdiqlaydi</div>
+      <div class="cert-student-name">{{ student.full_name }}</div>
+    </div>
+
+    <!-- Score blocks -->
+    <div class="cert-results">
+      <div class="cert-score-block">
+        <div class="cert-score-label">Overall Score / Ball</div>
+        <div class="cert-score-val band">{{ band_score }}</div>
+        <div class="cert-score-sub">out of 9.0</div>
+      </div>
+      <div class="cert-score-block">
+        <div class="cert-score-label">Percentage / Foiz</div>
+        <div class="cert-score-val">{{ percentage }}%</div>
+        <div class="cert-score-sub">{{ exam.total_score|floatformat:0 }} / {{ exam.max_score|floatformat:0 }} pts</div>
+      </div>
+      <div class="cert-score-block">
+        <div class="cert-score-label">Level / Daraja</div>
+        <div class="cert-score-val" style="font-size:20px">{{ level_label }}</div>
+        <div class="cert-score-sub">{{ level.name }}</div>
+      </div>
+      <div class="cert-score-block">
+        <div class="cert-score-label">Teacher / O'qituvchi</div>
+        <div class="cert-score-val" style="font-size:18px">{{ student.teacher.full_name }}</div>
+        <div class="cert-score-sub">Instructor</div>
+      </div>
+    </div>
+
+    <!-- Category breakdown -->
+    <div class="cert-cats">
+      {% for cat_name, cat_data in categories.items %}
+      {% if cat_data.total > 0 %}
+      <div class="cert-cat">
+        {{ cat_name }}: <span class="cert-cat-score">{{ cat_data.correct }}/{{ cat_data.total }}</span>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Bottom row -->
+    <div class="cert-bottom">
+      <div class="cert-sign">
+        <div class="cert-sign-line"></div>
+        <div class="cert-sign-title">Fast Education Director</div>
+      </div>
+
+      <div class="cert-date">
+        <div class="cert-date-val">{{ exam.completed_at|date:"d F Y" }}</div>
+        <div class="cert-date-lbl">Date of Assessment / Sana</div>
+      </div>
+
+      <div class="cert-stamp">
+        {% if stamp_url %}
+        <img src="{{ stamp_url }}" alt="Stamp">
+        {% else %}
+        <div style="width:72px;height:72px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto">
+          <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:var(--gold)">FE</span>
+        </div>
+        {% endif %}
+        <div class="cert-stamp-text">Verified</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="print-bar no-print">
+  <button class="btn-back" onclick="window.close()">← Yopish / Закрыть</button>
+  <button class="btn-print" onclick="window.print()">🖨 Chop etish / Печать</button>
+</div>
+
+</body>
+</html>

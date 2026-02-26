@@ -1,6 +1,6 @@
 """
-Script to create admin user and load initial data
-Run this after migrations: python create_admin.py
+Create admin user and load initial data.
+Run after migrations: python create_admin.py
 """
 import os
 import django
@@ -16,9 +16,9 @@ User = get_user_model()
 if not User.objects.filter(username='admin').exists():
     print("Creating default admin user...")
     User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print("✓ Admin user created! (username: admin, password: admin123)")
+    print("  Admin created! (username: admin, password: admin123)")
 else:
-    print("Admin user already exists.")
+    print("  Admin user already exists.")
 
 print("Loading initial data...")
 load_data()

@@ -3,7 +3,7 @@ Advanced AI Detection Module for Django
 Detects AI-generated, copied, or translated content
 """
 import re
-import numpy as np
+import statistics
 from typing import Tuple, List, Dict
 
 
@@ -68,9 +68,9 @@ class AdvancedAIDetector:
         sentence_lengths = [len(s.split()) for s in sentences]
         
         stats = {
-            'avg_word_length': float(np.mean(word_lengths)) if word_lengths else 0,
-            'avg_sentence_length': float(np.mean(sentence_lengths)) if sentence_lengths else 0,
-            'sentence_length_std': float(np.std(sentence_lengths)) if len(sentence_lengths) > 1 else 0,
+            'avg_word_length': statistics.mean(word_lengths) if word_lengths else 0,
+            'avg_sentence_length': statistics.mean(sentence_lengths) if sentence_lengths else 0,
+            'sentence_length_std': statistics.pstdev(sentence_lengths) if len(sentence_lengths) > 1 else 0,
             'total_sentences': len(sentences),
             'total_words': len(words),
             'unique_words_ratio': len(set(words)) / len(words) if words else 0
@@ -94,7 +94,7 @@ class AdvancedAIDetector:
             if len(sentences) > 3:
                 lengths = [len(s.split()) for s in sentences if s.strip()]
                 if lengths:
-                    std_dev = float(np.std(lengths))
+                    std_dev = statistics.pstdev(lengths)
                     if std_dev < 10:  # Very consistent
                         detected.append('PERFECT_TRANSLATION')
         

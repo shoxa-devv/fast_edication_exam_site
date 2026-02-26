@@ -19,6 +19,7 @@ SECRET_KEY = 'django-insecure-exam-site-secret-key-change-in-production'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.trycloudflare.com']
 
 
 # Application definition
@@ -73,7 +74,7 @@ WSGI_APPLICATION = 'exam_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'data' / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
