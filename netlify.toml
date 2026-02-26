@@ -1,0 +1,13 @@
+# Netlify configuration — Fast Education (static frontend export)
+# Backend (Django) must be deployed separately; set API proxy in Netlify if needed.
+
+[build]
+  command = "bash scripts/build_netlify.sh"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# SPA: handled by public/_redirects (/* -> /index.html 200)
+# To proxy /api to your Django backend, add in Netlify UI:
+#   Redirects: /api/*  https://YOUR-DJANGO-URL/api/:splat  200
