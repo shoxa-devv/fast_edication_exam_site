@@ -17,6 +17,7 @@ cp -r "$STATIC/images/"* "$PUBLIC/images/" 2>/dev/null || true
 sed -e "s|{% load static %}||g" \
     -e "s|{% static 'css/style.css' %}|/css/style.css|g" \
     -e "s|{% static 'js/app.js' %}|/js/app.js|g" \
+    -e "s|{% static 'images/favicon.png' %}|/images/favicon.png|g" \
     -e "s|{% static 'images/logo.png' %}|/images/logo.png|g" \
     -e "s|{% static 'images/levels/\([^']*\)' %}|/images/levels/\1|g" \
     "$STATIC/index.html" > "$PUBLIC/index.html"
