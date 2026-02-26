@@ -1,0 +1,13 @@
+# Render.com — Django backend (Netlify frontend ulashi uchun)
+# https://dashboard.render.com → New → Blueprint → Connect repo → Select this file
+
+services:
+  - type: web
+    name: fast-education-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"

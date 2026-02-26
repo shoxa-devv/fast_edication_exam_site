@@ -19,7 +19,11 @@ SECRET_KEY = 'django-insecure-exam-site-secret-key-change-in-production'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://*.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.trycloudflare.com',
+    'https://*.netlify.app',
+    'https://cozy-salamander-4693b4.netlify.app',
+]
 
 
 # Application definition

@@ -17,7 +17,7 @@ echo "  Setting up data..."
 python create_admin.py 2>&1
 
 echo ""
-echo "  Server running on port 8000"
+echo "  Server running on port ${PORT:-8000}"
 echo ""
 
-exec gunicorn exam_site.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
+exec gunicorn exam_site.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120
