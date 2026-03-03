@@ -7,6 +7,10 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
@@ -15,7 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 COPY backend/ .
 
 # Create directories
-RUN mkdir -p staticfiles media
+RUN mkdir -p staticfiles media data
 
 # Expose port
 EXPOSE 8000
