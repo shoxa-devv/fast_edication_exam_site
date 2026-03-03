@@ -1,6 +1,9 @@
 from django.urls import path
 from . import admin_views as v
 
+#fuck
+
+
 urlpatterns = [
     # Auth
     path('login/', v.admin_login, name='panel_login'),
