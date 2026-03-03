@@ -2,7 +2,7 @@
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
-BACKEND_DIR="$PROJECT_DIR/backend"
+BACKEND_DIR="$PROJECT_DIR"
 VENV_DIR="$PROJECT_DIR/.venv"
 PORT=8000
 CLOUDFLARED="/tmp/cloudflared"
@@ -33,14 +33,13 @@ echo "  Installing dependencies..."
 pip install --upgrade pip setuptools wheel 2>&1 | tail -1
 pip install -r "$BACKEND_DIR/requirements.txt" 2>&1 | tail -3
 
-cd "$BACKEND_DIR"
-
 echo "  Running migrations..."
 python manage.py makemigrations --noinput 2>&1 | tail -3
 python manage.py migrate --run-syncdb 2>&1 | tail -3
 
 echo "  Setting up data..."
 python create_admin.py 2>&1
+
 
 # Download cloudflared if not present
 if [ ! -x "$CLOUDFLARED" ]; then

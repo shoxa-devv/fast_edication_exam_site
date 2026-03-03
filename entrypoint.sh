@@ -29,29 +29,33 @@ fi
 
 echo ""
 echo "  Starting Gunicorn server..."
-GUNICORN_LOG="/tmp/gunicorn.log"
-gunicorn exam_site.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 > "$GUNICORN_LOG" 2>&1 &
+# Run gunicorn in background but redirect to stdout so docker logs can see it
+gunicorn exam_site.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 &
 GUNICORN_PID=$!
-sleep 3
-
+sleep 2
 
 echo "  Starting public tunnel..."
 TUNNEL_LOG="/tmp/cloudflared_output.log"
+# Start cloudflared in background
 $CLOUDFLARED tunnel --url "http://localhost:$PORT" > "$TUNNEL_LOG" 2>&1 &
 TUNNEL_PID=$!
 
-# Wait for URL
+# Wait for URL - improve parsing to avoid 'api.trycloudflare.com'
 PUBLIC_URL=""
-for i in $(seq 1 15); do
+echo "  Waiting for public URL..."
+for i in $(seq 1 30); do
     sleep 1
-    PUBLIC_URL=$(grep -oP 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' "$TUNNEL_LOG" 2>/dev/null | head -1)
+    # Find the link that is NOT api.trycloudflare.com
+    PUBLIC_URL=$(grep -oP 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' "$TUNNEL_LOG" 2>/dev/null | grep -v "api.trycloudflare.com" | head -1)
     if [ -n "$PUBLIC_URL" ]; then
         break
     fi
 done
 
 if [ -z "$PUBLIC_URL" ]; then
-    PUBLIC_URL="(waiting for tunnel...)"
+    PUBLIC_URL="(link generated but not captured - check logs)"
+    echo "  ! Cloudflare log content:"
+    cat "$TUNNEL_LOG"
 fi
 
 echo ""
@@ -68,11 +72,11 @@ echo ""
 
 cleanup() {
     echo "  Stopping services..."
-    kill $GUNICORN_PID 2>/dev/null
-    kill $TUNNEL_PID 2>/dev/null
-    rm -f "$TUNNEL_LOG"
+    kill $GUNICORN_PID $TUNNEL_PID 2>/dev/null
 }
 trap cleanup EXIT INT TERM
 
-wait $GUNICORN_PID $TUNNEL_PID
+# Wait for gunicorn to stay running
+wait $GUNICORN_PID
+
 
