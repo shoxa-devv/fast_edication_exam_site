@@ -8,10 +8,12 @@ Modern English exam platform with Django backend, Jazzmin-style admin panel, and
 ./run.sh
 ```
 
-That's it. Open http://localhost:8000 in your browser.
+That's it. Script will start the server and create a **Cloudflare Public Link**.  
+Copy the `🌐 SAYT` link from the terminal output to access the site.
 
-**Admin panel:** http://localhost:8000/admin  
+**Admin panel:** Open `/admin` on the public link.  
 **Login:** `admin` / `admin123`
+
 
 ## Features
 

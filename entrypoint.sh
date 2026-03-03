@@ -29,9 +29,11 @@ fi
 
 echo ""
 echo "  Starting Gunicorn server..."
-gunicorn exam_site.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 > /dev/null 2>&1 &
+GUNICORN_LOG="/tmp/gunicorn.log"
+gunicorn exam_site.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 > "$GUNICORN_LOG" 2>&1 &
 GUNICORN_PID=$!
-sleep 2
+sleep 3
+
 
 echo "  Starting public tunnel..."
 TUNNEL_LOG="/tmp/cloudflared_output.log"

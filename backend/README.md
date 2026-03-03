@@ -16,20 +16,24 @@ pip install -r requirements.txt
 ### 2. Run the Application
 
 ```bash
-python app.py
+cd ..
+./run.sh
 ```
 
 This will:
 - Run database migrations
-- Start Django server on http://localhost:8000
-- Serve the frontend HTML/CSS/JS
+- Start Django server
+- Create a Cloudflare tunnel and provide a **Public URL**
+- Serve the frontend
 - Create admin user if needed (username: `admin`, password: `admin123`)
 
 ### 3. Access the Site
 
-- **Frontend**: http://localhost:8000
-- **Admin Panel**: http://localhost:8000/admin
-- **API**: http://localhost:8000/api/
+Use the **Public URL** (e.g., `https://...trycloudflare.com`) displayed in the terminal:
+- **Frontend**: `[Public URL]`
+- **Admin Panel**: `[Public URL]/admin`
+- **API**: `[Public URL]/api/`
+
 
 ## Admin Panel Features
 
