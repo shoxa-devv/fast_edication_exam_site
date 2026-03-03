@@ -7,6 +7,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = BASE_DIR.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -56,7 +57,10 @@ ROOT_URLCONF = 'exam_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'static'],
+        'DIRS': [
+            ROOT_DIR / 'frontend' / 'templates',
+            ROOT_DIR / 'frontend' / 'static'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,7 +126,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    ROOT_DIR / 'frontend' / 'static',
     BASE_DIR / 'exams' / 'static',  # Admin custom CSS
 ]
 

@@ -1,12 +1,14 @@
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8080:8000"
     volumes:
-      - sqlite_data:/app/data
-      - static_files:/app/staticfiles
-      - media_files:/app/media
+      - sqlite_data:/app/backend/data
+      - static_files:/app/backend/staticfiles
+      - media_files:/app/backend/media
     environment:
       - DJANGO_SETTINGS_MODULE=exam_site.settings
       - PYTHONDONTWRITEBYTECODE=1
