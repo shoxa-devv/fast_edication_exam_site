@@ -5,12 +5,16 @@
 const API = '/api';
 let studentId = null, studentName = '', teacherName = '';
 let levels = [], currentLevel = null, currentMonth = null;
+let months = [], currentLevelInfo = null;
 let cats = [], qs = [], ans = {};
 let qi = 0, sec = 0, clock = null;
 let completedSections = new Set();
 let reviewData = null;
 let lastSessionId = null;
-let currentLang = 'uz';
+let currentLang = localStorage.getItem('fe_lang') || '';
+
+const LANG_FLAGS = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
+const LANG_NAMES = { uz: "O'zbek", ru: 'Русский', en: 'English' };
 
 const UI = {
   uz: {
@@ -26,6 +30,7 @@ const UI = {
     surname: "Familiya",
     teacher: "O'qituvchi",
     teacher_name: "O'qituvchi ismi",
+    teacher_surname: "Familiyasi",
     pick_level: "Darajangizni tanlang",
     pick_level_hint: "Mos darajani tanlang va testlarni boshlang",
     pick_month: "Oy tanlang va testlarni boshlang",
@@ -44,6 +49,26 @@ const UI = {
     no_answer: "Javob berilmadi",
     correct_ans: "To'g'ri",
     your_ans: "Javob",
+    name_placeholder: "Ismingiz",
+    surname_placeholder: "Familiyangiz",
+    teacher_name_placeholder: "O'qituvchi ismi",
+    teacher_surname_placeholder: "O'qituvchi familiyasi",
+    choose_answer: "To'g'ri javobni tanlang:",
+    choose_word: "So'z ma'nosini tanlang:",
+    translate: "Ingliz tiliga tarjima qiling",
+    write_answer: "Javobingizni yozing",
+    translate_placeholder: "Tarjimangizni yozing...",
+    write_placeholder: "Yozishni boshlang...",
+    words_label: "So'zlar",
+    submitting: "Yuborilmoqda...",
+    error: "Xatolik",
+    no_tests: "Bu oy uchun testlar yo'q",
+    levels_error: "Darajalar yuklanmadi",
+    months_error: "Oylar yuklanmadi",
+    questions_error: "Savollar yuklanmadi",
+    network_error: "Server bilan bog'lanib bo'lmadi",
+    month_label: "oy",
+    select_language: "Tilni tanlang",
   },
   ru: {
     start: "Начать",
@@ -58,6 +83,7 @@ const UI = {
     surname: "Фамилия",
     teacher: "Учитель",
     teacher_name: "Имя учителя",
+    teacher_surname: "Фамилия",
     pick_level: "Выберите уровень",
     pick_level_hint: "Выберите подходящий уровень и начните тесты",
     pick_month: "Выберите месяц и начните тесты",
@@ -76,6 +102,79 @@ const UI = {
     no_answer: "Нет ответа",
     correct_ans: "Правильный",
     your_ans: "Ответ",
+    name_placeholder: "Ваше имя",
+    surname_placeholder: "Ваша фамилия",
+    teacher_name_placeholder: "Имя учителя",
+    teacher_surname_placeholder: "Фамилия учителя",
+    choose_answer: "Выберите правильный ответ:",
+    choose_word: "Выберите значение слова:",
+    translate: "Переведите на английский",
+    write_answer: "Напишите ответ",
+    translate_placeholder: "Напишите перевод...",
+    write_placeholder: "Начните писать...",
+    words_label: "Слов",
+    submitting: "Отправка...",
+    error: "Ошибка",
+    no_tests: "Для этого месяца тестов нет",
+    levels_error: "Уровни не загружены",
+    months_error: "Месяцы не загружены",
+    questions_error: "Вопросы не загружены",
+    network_error: "Ошибка соединения с сервером",
+    month_label: "мес.",
+    select_language: "Выберите язык",
+  },
+  en: {
+    start: "Start",
+    loading: "Loading...",
+    back: "Back",
+    next: "Next",
+    prev: "Previous",
+    submit: "Submit",
+    reg_title: "Registration",
+    reg_hint: "Enter your details to begin the exam",
+    name: "First Name",
+    surname: "Last Name",
+    teacher: "Teacher",
+    teacher_name: "Teacher's Name",
+    teacher_surname: "Teacher's Surname",
+    pick_level: "Choose Your Level",
+    pick_level_hint: "Select the appropriate level and start the tests",
+    pick_month: "Choose a month and start the tests",
+    month_stats: "questions",
+    word_stats: "words",
+    exam_submit_confirm: "Submit the exam?",
+    results_title: "Results",
+    score_lbl: "Score",
+    correct_lbl: "Correct",
+    total_lbl: "Total",
+    time_lbl: "Time",
+    new_test: "New Test",
+    cert_btn: "Certificate",
+    calculating: "Calculating results...",
+    wait_hint: "Please wait",
+    no_answer: "No answer",
+    correct_ans: "Correct",
+    your_ans: "Answer",
+    name_placeholder: "Your first name",
+    surname_placeholder: "Your last name",
+    teacher_name_placeholder: "Teacher's name",
+    teacher_surname_placeholder: "Teacher's surname",
+    choose_answer: "Choose the correct answer:",
+    choose_word: "Choose the meaning of the word:",
+    translate: "Translate into English",
+    write_answer: "Write your answer",
+    translate_placeholder: "Write your translation...",
+    write_placeholder: "Start writing...",
+    words_label: "Words",
+    submitting: "Submitting...",
+    error: "Error",
+    no_tests: "No tests available for this month",
+    levels_error: "Levels could not be loaded",
+    months_error: "Months could not be loaded",
+    questions_error: "Questions could not be loaded",
+    network_error: "Could not connect to server",
+    month_label: "months",
+    select_language: "Select language",
   }
 };
 
@@ -88,23 +187,93 @@ const swap = id => {
   if (el) el.classList.add('active');
 };
 
+/* Helper: split bilingual backend text like "English text / Русский текст" */
+/* Helper: split bilingual backend text like "English text / Russian text" */
+function localizeText(text) {
+  if (!text) return '';
+  let res = text;
+  const parts = text.split(' / ');
+  if (parts.length > 1) {
+    if (currentLang === 'ru') res = parts[parts.length - 1] || text;
+    else res = parts[0] || text;
+  }
+
+  if (currentLang === 'en') {
+    // 1. Manually translate common phrases from backend
+    const translations = {
+      "Bolalar uchun boshlang'ich daraja": "Elementary level for children",
+      "Bolalar uchun ikkinchi daraja": "Second level for children",
+      "Yangi boshlovchilar uchun": "For beginners",
+      "Boshlang'ich bilim mustahkamlash": "Strengthening basic knowledge",
+      "Boshlang'ich daraja": "Beginner level",
+      "Elementary daraja": "Elementary level",
+      "Pre-Intermediate daraja": "Pre-Intermediate level",
+      "Intermediate daraja": "Intermediate level",
+      "Upper-Intermediate daraja": "Upper-Intermediate level",
+      "Advanced daraja": "Advanced level",
+    };
+
+    const trimmedRes = res.trim();
+    if (translations[trimmedRes]) return translations[trimmedRes];
+
+    // 2. Handle specific format for months "1-oy"
+    const oyMatch = res.match(/^(\d+)-oy$/i);
+    if (oyMatch) return `Month ${oyMatch[1]}`;
+
+    // 3. Fallback replacements
+    return res.replace(/daraja/gi, 'Level').replace(/uchun/gi, 'for');
+  }
+
+  return res;
+}
+
 function setLang(lang) {
   currentLang = lang;
+  localStorage.setItem('fe_lang', lang);
   updateUI();
-  hide($('v-lang'));
+  // Hide language overlay if it's visible
+  const overlay = $('v-lang');
+  if (overlay && !overlay.hasAttribute('hidden')) hide(overlay);
+  // Update all lang switcher buttons
+  updateLangSwitchers();
+  saveState();
+}
+
+function updateLangSwitchers() {
+  document.querySelectorAll('.lang-switcher-current').forEach(el => {
+    el.innerHTML = `${LANG_FLAGS[currentLang]} ${LANG_NAMES[currentLang]} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
+  });
 }
 
 function updateUI() {
   const t = UI[currentLang];
+  // Header Info
+  const userLbl = $('user-lbl');
+  if (userLbl) userLbl.textContent = studentName || '';
+  const examBadge = $('exam-badge');
+  if (examBadge && currentLevel && currentMonth) {
+    const monthLabel = localizeText(currentMonth.name) || `${currentMonth.number}-${t.month_label}`;
+    examBadge.textContent = `${localizeText(currentLevel.name)} — ${monthLabel}`;
+  }
+
   // Registration
-  document.querySelector('#v-register h2').innerHTML = `${t.reg_title} <span class="sub-ru">${currentLang === 'uz' ? 'Registration' : ''}</span>`;
-  document.querySelector('#v-register .form-hint').innerHTML = t.reg_hint;
-  document.querySelector('label[for=inp-first]').innerText = t.name + ' / Имя';
-  document.querySelector('label[for=inp-last]').innerText = t.surname + ' / Фамилия';
-  document.querySelector('label[for=inp-tfirst]').innerText = t.teacher_name + ' / Имя учителя';
-  document.querySelector('label[for=inp-tlast]').innerText = t.surname + ' / Фамилия';
-  document.querySelector('.form-sep').innerHTML = `${t.teacher} / <span class="ru">Учитель</span>`;
-  $('btn-register').querySelector('span').innerText = t.start;
+  const vReg = document.querySelector('#v-register');
+  if (vReg) {
+    vReg.querySelector('h2').innerHTML = t.reg_title;
+    vReg.querySelector('.form-hint').innerHTML = t.reg_hint;
+  }
+  document.querySelector('label[for=inp-first]').innerText = t.name;
+  document.querySelector('label[for=inp-last]').innerText = t.surname;
+  document.querySelector('label[for=inp-tfirst]').innerText = t.teacher_name;
+  document.querySelector('label[for=inp-tlast]').innerText = t.teacher_surname;
+  document.querySelector('.form-sep').innerHTML = t.teacher;
+  $('inp-first').placeholder = t.name_placeholder;
+  $('inp-last').placeholder = t.surname_placeholder;
+  $('inp-tfirst').placeholder = t.teacher_name_placeholder;
+  $('inp-tlast').placeholder = t.teacher_surname_placeholder;
+  const regBtn = $('btn-register');
+  const regSpan = regBtn.querySelector('span');
+  if (regSpan) regSpan.innerText = t.start;
 
   // Levels
   document.querySelector('#v-levels h1').innerText = t.pick_level;
@@ -129,27 +298,155 @@ function updateUI() {
   document.querySelector('button[onclick="location.reload()"]').innerText = t.new_test;
 
   // Loading
-  document.querySelector('#v-loading-res h3').innerText = t.calculating;
-  document.querySelector('#v-loading-res p').innerText = t.wait_hint;
+  const vLoad = $('v-loading-res');
+  if (vLoad) {
+    vLoad.querySelector('h3').innerText = t.calculating;
+    vLoad.querySelector('p').innerText = t.wait_hint;
+  }
+
+  // Re-render current scene content if necessary
+  const activeScene = document.querySelector('.scene.active')?.id;
+  if (activeScene === 'v-levels' && levels.length > 0) renderLevels();
+  if (activeScene === 'v-months' && months.length > 0) renderMonths(currentLevelInfo, months);
+  if (activeScene === 'v-exam' && qs.length > 0) go(qi);
 }
 
 /* ═══ Boot ═══ */
 document.addEventListener('DOMContentLoaded', () => {
+  // No language overlay — default to 'uz' if not saved
+  if (!currentLang || !UI[currentLang]) {
+    currentLang = 'uz';
+    localStorage.setItem('fe_lang', 'uz');
+  }
+  // Always hide overlay (it's not needed anymore)
+  const langOverlay = $('v-lang');
+  if (langOverlay) hide(langOverlay);
+
+  initLangSwitchers();
+  loadState();
+
   const inps = ['inp-first', 'inp-last', 'inp-tfirst', 'inp-tlast'].map(id => $(id));
   const checkForm = () => {
-    $('btn-register').disabled = !inps.every(i => i.value.trim().length >= 2);
+    $('btn-register').disabled = !inps.every(i => i && i.value.trim().length >= 2);
   };
-  inps.forEach(i => {
-    i.addEventListener('input', checkForm);
-    i.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !$('btn-register').disabled) doRegister();
+  inps.forEach(i => i && i.addEventListener('input', checkForm));
+  $('btn-register').addEventListener('click', doRegister);
+  $('btn-back-levels').addEventListener('click', () => {
+    swap('v-levels');
+    saveState();
+  });
+  $('nav-next').addEventListener('click', handleNext);
+  $('nav-prev').addEventListener('click', () => { if (qi > 0) go(qi - 1); });
+  $('nav-submit').addEventListener('click', () => {
+    if (confirm(UI[currentLang].exam_submit_confirm)) submitExam();
+  });
+});
+
+function initLangSwitchers() {
+  // Setup lang switcher dropdowns
+  document.querySelectorAll('.lang-switcher').forEach(sw => {
+    const btn = sw.querySelector('.lang-switcher-current');
+    const menu = sw.querySelector('.lang-switcher-menu');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close all other open menus
+      document.querySelectorAll('.lang-switcher-menu.open').forEach(m => {
+        if (m !== menu) m.classList.remove('open');
+      });
+      menu.classList.toggle('open');
+    });
+    menu.querySelectorAll('button').forEach(langBtn => {
+      langBtn.addEventListener('click', () => {
+        setLang(langBtn.dataset.lang);
+        menu.classList.remove('open');
+      });
     });
   });
-  $('btn-register').addEventListener('click', doRegister);
-  $('btn-back-levels').addEventListener('click', () => swap('v-levels'));
-  $('nav-prev').addEventListener('click', () => go(qi - 1));
-  $('nav-next').addEventListener('click', handleNext);
-  $('nav-submit').addEventListener('click', submitExam);
+
+  // Close menus when clicking outside
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.lang-switcher-menu.open').forEach(m => m.classList.remove('open'));
+  });
+}
+
+function saveState() {
+  const currentScene = document.querySelector('.scene.active')?.id || 'v-register';
+  // Don't save if it's the loading or results screen (usually better to reset or stay)
+  if (currentScene === 'v-loading-res' || currentScene === 'v-results') return;
+
+  const state = {
+    scene: currentScene,
+    studentName,
+    currentLevel,
+    currentMonth,
+    qs,
+    ans,
+    qi,
+    sec,
+    cats,
+    completedSections: Array.from(completedSections || [])
+  };
+  localStorage.setItem('fe_state', JSON.stringify(state));
+}
+
+function startTimer() {
+  if (clock) clearInterval(clock);
+  clock = setInterval(() => {
+    sec++;
+    $('timer-t').textContent =
+      `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+    saveState(); // Save time progress
+  }, 1000);
+}
+
+async function loadState() {
+  const saved = localStorage.getItem('fe_state');
+  if (!saved) {
+    updateUI();
+    updateLangSwitchers();
+    return;
+  }
+
+  try {
+    const s = JSON.parse(saved);
+    studentName = s.studentName;
+    currentLevel = s.currentLevel;
+    currentMonth = s.currentMonth;
+    qs = s.qs || [];
+    ans = s.ans || {};
+    qi = s.qi || 0;
+    sec = s.sec || 0;
+    cats = s.cats || [];
+    completedSections = new Set(s.completedSections || []);
+
+    updateUI();
+    updateLangSwitchers();
+
+    if (s.scene === 'v-exam' && qs.length > 0) {
+      swap('v-exam');
+      buildDots();
+      go(qi);
+      startTimer();
+    } else if (s.scene === 'v-months' && currentLevel) {
+      // Re-fetch months to ensure data is fresh
+      await loadMonths(currentLevel);
+    } else if (s.scene === 'v-levels' && studentName) {
+      // Re-fetch levels to ensure data is fresh
+      await loadLevels();
+    } else {
+      swap(s.scene || 'v-register');
+    }
+  } catch (e) {
+    console.error("Failed to load state", e);
+    localStorage.removeItem('fe_state'); // Clear corrupted state
+    updateUI();
+    updateLangSwitchers();
+    swap('v-register'); // Go to registration on error
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
   const mc = $('modal-close');
   if (mc) mc.addEventListener('click', () => hide($('review-modal')));
 });
@@ -164,7 +461,7 @@ async function doRegister() {
   };
   try {
     $('btn-register').disabled = true;
-    $('btn-register').textContent = 'Yuklanmoqda... / Загрузка...';
+    $('btn-register').textContent = UI[currentLang].loading;
     const resp = await fetch(`${API}/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -177,16 +474,17 @@ async function doRegister() {
       studentId = r.student_id;
       studentName = r.student_name;
       teacherName = r.teacher_name;
+      saveState();
       await loadLevels();
     } else {
-      alert(r.error || 'Xatolik / Ошибка');
+      alert(r.error || UI[currentLang].error);
       $('btn-register').disabled = false;
       $('btn-register').querySelector('span').innerText = UI[currentLang].start;
     }
   } catch (e) {
-    alert('Server bilan bog\'lanib bo\'lmadi / Ошибка соединения.\n\nNetlify: BACKEND_URL o\'rnating (Django sayt manzili).\nYoki Django backendni Railway/Render da ishga tushiring.');
+    alert(UI[currentLang].network_error);
     $('btn-register').disabled = false;
-    $('btn-register').innerHTML = "Boshlash / Начать";
+    $('btn-register').innerHTML = UI[currentLang].start;
   }
 }
 
@@ -198,8 +496,9 @@ async function loadLevels() {
     renderLevels();
     swap('v-levels');
     $('nav-user').textContent = studentName;
+    saveState();
   } catch {
-    alert('Darajalar yuklanmadi / Уровни не загружены');
+    alert(UI[currentLang].levels_error);
   }
 }
 
@@ -218,10 +517,10 @@ function renderLevels() {
         <div class="lc-badge">${lv.icon}</div>
       </div>
       <div class="lc-body">
-        <div class="lc-name">${lv.name}</div>
-        <div class="lc-desc">${lv.description || ''}</div>
+        <div class="lc-name">${localizeText(lv.name)}</div>
+        <div class="lc-desc">${localizeText(lv.description)}</div>
         <div class="lc-footer">
-          <span class="lc-meta">${lv.month_count} ${currentLang === 'uz' ? 'oy' : 'мес.'}</span>
+          <span class="lc-meta">${lv.month_count} ${UI[currentLang].month_label}</span>
           <span class="lc-arrow">&rarr;</span>
         </div>
       </div>
@@ -232,16 +531,19 @@ function renderLevels() {
 }
 
 /* ═══ 3. Months ═══ */
-async function loadMonths(lv) {
-  currentLevel = lv;
+async function loadMonths(level) {
+  currentLevel = level;
   try {
-    const r = await (await fetch(`${API}/levels/${lv.slug}/months/`)).json();
-    if (!r.success) { alert('Oylar yuklanmadi / Месяцы не загружены'); return; }
-    renderMonths(r.level, r.months);
+    const r = await (await fetch(`${API}/levels/${level.slug}/months/`)).json();
+    if (!r.success) { alert(UI[currentLang].months_error); return; }
+    months = r.months || [];
+    currentLevelInfo = r.level;
+    renderMonths(currentLevelInfo, months);
     swap('v-months');
     $('nav-user2').textContent = studentName;
+    saveState();
   } catch {
-    alert('Oylar yuklanmadi / Месяцы не загружены');
+    alert(UI[currentLang].months_error);
   }
 }
 
@@ -258,7 +560,7 @@ function renderMonths(levelInfo, months) {
     card.style.animationDelay = `${i * .08}s`;
     card.innerHTML = `
       <div class="mc-num">${m.number}</div>
-      <div class="mc-name">${m.name}</div>
+      <div class="mc-name">${localizeText(m.name)}</div>
       <div class="mc-stats">
         <span><b>${m.question_count}</b> ${UI[currentLang].month_stats}</span>
         <span><b>${m.vocab_count}</b> ${UI[currentLang].word_stats}</span>
@@ -278,7 +580,7 @@ async function startExam(month) {
       `${API}/levels/${currentLevel.slug}/months/${month.number}/questions/`
     )).json();
     if (!r.success || !r.questions.length) {
-      alert("Bu oy uchun testlar yo'q / Для этого месяца тестов нет");
+      alert(UI[currentLang].no_tests);
       return;
     }
     cats = r.categories || [];
@@ -290,20 +592,16 @@ async function startExam(month) {
     reviewData = null;
 
     swap('v-exam');
-    const monthLabel = month.name.includes(month.number) ? month.name : `${month.number}-oy`;
+    const monthLabel = localizeText(month.name) || `${month.number}-${UI[currentLang].month_label}`;
     $('exam-badge').textContent = `${currentLevel.name} — ${monthLabel}`;
     $('user-lbl').textContent = studentName;
     buildDots();
     go(0);
 
-    if (clock) clearInterval(clock);
-    clock = setInterval(() => {
-      sec++;
-      $('timer-t').textContent =
-        `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
-    }, 1000);
+    startTimer();
+    saveState();
   } catch {
-    alert('Savollar yuklanmadi / Вопросы не загружены');
+    alert(UI[currentLang].questions_error);
   }
 }
 
@@ -371,10 +669,10 @@ function showSectionComplete(catName, nextQ) {
 
   overlay.innerHTML = `
     <div class="section-done-card">
-      <h2>${catName} — tugadi! / завершён!</h2>
-      <p>Keyingi bo'limga o'tamizmi? / Перейти к следующему разделу?</p>
+      <h2>${catName} — ${currentLang === 'en' ? 'completed!' : currentLang === 'ru' ? 'завершён!' : 'tugadi!'}</h2>
+      <p>${currentLang === 'en' ? 'Continue to the next section?' : currentLang === 'ru' ? 'Перейти к следующему разделу?' : "Keyingi bo'limga o'tamizmi?"}</p>
       <div class="sd-list">${listHtml}</div>
-      <button class="btn-primary" id="sd-continue">Davom etish / Продолжить</button>
+      <button class="btn-primary" id="sd-continue">${currentLang === 'en' ? 'Continue' : currentLang === 'ru' ? 'Продолжить' : 'Davom etish'}</button>
     </div>
   `;
 
@@ -385,6 +683,7 @@ function showSectionComplete(catName, nextQ) {
     if (ni >= 0) {
       buildDots();
       go(ni);
+      saveState();
     }
   });
 }
@@ -398,6 +697,7 @@ function go(i) {
   }
 
   qi = i;
+  saveState();
   const q = qs[i], k = String(q.id);
   const cqs = qs.filter(x => x.category === q.category);
   const pos = cqs.indexOf(q) + 1;
@@ -410,24 +710,31 @@ function go(i) {
 
   $('nav-prev').disabled = pos === 1;
 
-  if (isLastOverall) {
-    $('nav-next').hidden = true;
-    $('nav-submit').hidden = false;
+  const navNext = $('nav-next');
+  const navSubmit = $('nav-submit');
+
+  if (isLastOverall || q.question_type === 'writing') {
+    navNext.hidden = true;
+    navNext.style.display = 'none';
+    navSubmit.hidden = false;
+    navSubmit.style.display = 'inline-block';
   } else {
-    $('nav-next').hidden = false;
-    $('nav-next').textContent = 'Keyingi / Далее \u2192';
-    $('nav-submit').hidden = true;
+    navNext.hidden = false;
+    navNext.style.display = 'inline-block';
+    navNext.textContent = `${UI[currentLang].next} \u2192`;
+    navSubmit.hidden = true;
+    navSubmit.style.display = 'none';
   }
 
   const body = $('q-body');
   body.innerHTML = '';
 
   if (q.question_type === 'multiple_choice') {
-    $('q-sub').textContent = 'To\'g\'ri javobni tanlang / Выберите правильный ответ:';
+    $('q-sub').textContent = UI[currentLang].choose_answer;
     $('q-title').textContent = q.question_text;
     body.appendChild(makeOpts(q, k));
   } else if (q.question_type === 'vocabulary') {
-    $('q-sub').textContent = "So'z ma'nosini tanlang / Выберите значение слова:";
+    $('q-sub').textContent = UI[currentLang].choose_word;
     $('q-title').textContent = '';
     const vw = document.createElement('div');
     vw.className = 'v-word';
@@ -435,20 +742,20 @@ function go(i) {
     body.appendChild(vw);
     body.appendChild(makeOpts(q, k));
   } else if (q.question_type === 'translation') {
-    $('q-sub').textContent = (q.instructions || 'Ingliz tiliga tarjima qiling') + ' / Переведите на английский';
+    $('q-sub').textContent = localizeText(q.instructions) || UI[currentLang].translate;
     $('q-title').textContent = '';
     const s = document.createElement('div');
     s.className = 't-source';
     s.innerHTML = `<p>${q.question_text}</p>`;
     body.appendChild(s);
-    body.appendChild(makeTa(k, 3, 'Tarjimangizni yozing / Напишите перевод...'));
+    body.appendChild(makeTa(k, 3, UI[currentLang].translate_placeholder));
   } else if (q.question_type === 'writing') {
-    $('q-sub').textContent = (q.instructions || 'Javobingizni yozing') + ' / Напишите ответ';
+    $('q-sub').textContent = localizeText(q.instructions) || UI[currentLang].write_answer;
     $('q-title').textContent = q.question_text;
-    body.appendChild(makeTa(k, 10, 'Yozishni boshlang / Начните писать...', true));
+    body.appendChild(makeTa(k, 10, UI[currentLang].write_placeholder, true));
     const bar = document.createElement('div');
     bar.className = 'wbar';
-    bar.innerHTML = `So'zlar / Слов: <b id="wc">${countW(ans[k] || '')}</b> / ${q.min_words} min`;
+    bar.innerHTML = `${UI[currentLang].words_label}: <b id="wc">${countW(ans[k] || '')}</b> / ${q.min_words} min`;
     body.appendChild(bar);
   }
 
@@ -478,6 +785,7 @@ function makeOpts(q, k) {
       el.classList.add('picked');
       el.querySelector('input').checked = true;
       syncDots();
+      saveState();
     });
     d.appendChild(el);
   });
@@ -503,6 +811,7 @@ function makeTa(k, rows, ph, big) {
     const wc = $('wc');
     if (wc) wc.textContent = countW(ta.value);
     syncDots();
+    saveState();
 
     clearTimeout(aiCheckTimer);
     if (ta.value.trim().length > 40) {
@@ -541,9 +850,9 @@ function countW(t) { return t.trim().split(/\s+/).filter(w => w).length; }
 
 /* ═══ Submit ═══ */
 async function submitExam() {
-  if (!confirm("Imtihonni topshirasizmi? / Сдать экзамен?")) return;
+  if (!confirm(UI[currentLang].exam_submit_confirm)) return;
   $('nav-submit').disabled = true;
-  $('nav-submit').textContent = 'Yuborilmoqda... / Отправка...';
+  $('nav-submit').textContent = UI[currentLang].submitting;
   try {
     const r = await (await fetch(`${API}/submit-exam/`, {
       method: 'POST',
@@ -577,27 +886,28 @@ async function submitExam() {
           clearInterval(counter);
           setTimeout(() => {
             hide($('v-loading-res'));
+            localStorage.removeItem('fe_state');
             showResults(r);
           }, 200); // 0.2s pause at 100%
         }
         $('rl-pct').textContent = Math.round(progress) + '%';
       }, interval);
     } else {
-      alert('Xatolik / Ошибка: ' + (r.error || ''));
+      alert(UI[currentLang].error + ': ' + (r.error || ''));
       $('nav-submit').disabled = false;
-      $('nav-submit').textContent = 'Topshirish / Сдать';
+      $('nav-submit').textContent = UI[currentLang].submit;
     }
   } catch {
-    alert('Tarmoq xatosi / Ошибка сети');
+    alert(UI[currentLang].network_error);
     $('nav-submit').disabled = false;
-    $('nav-submit').textContent = 'Topshirish / Сдать';
+    $('nav-submit').textContent = UI[currentLang].submit;
   }
 }
 
 /* ═══ Results ═══ */
 function showResults(d) {
   swap('v-results');
-  const monthLabel = currentMonth.name.includes(currentMonth.number) ? currentMonth.name : `${currentMonth.number}-oy`;
+  const monthLabel = localizeText(currentMonth.name) || `${currentMonth.number}-${UI[currentLang].month_label}`;
   $('res-name').textContent = `${studentName} — ${currentLevel.name} / ${monthLabel}`;
 
   const s = d.score || {};
@@ -640,9 +950,9 @@ function showResults(d) {
 
       let ansHtml = '';
       if (item.questionType === 'multiple_choice' || item.questionType === 'vocabulary') {
-        ansHtml = `<p class="rev-ans"><b>Javob / Ответ:</b> <span class="${ok ? 'rev-ok' : 'rev-your'}">${item.yourAnswer || 'Javob berilmadi / Нет ответа'}</span></p>`;
+        ansHtml = `<p class="rev-ans"><b>${UI[currentLang].your_ans}:</b> <span class="${ok ? 'rev-ok' : 'rev-your'}">${item.yourAnswer || UI[currentLang].no_answer}</span></p>`;
         if (!ok) {
-          ansHtml += `<p class="rev-ans"><b>To'g'ri / Правильный:</b> <span class="rev-ok">${item.correctAnswer || ''}</span></p>`;
+          ansHtml += `<p class="rev-ans"><b>${UI[currentLang].correct_ans}:</b> <span class="rev-ok">${item.correctAnswer || ''}</span></p>`;
         }
       } else {
         const fullText = item.yourAnswer || UI[currentLang].no_answer;

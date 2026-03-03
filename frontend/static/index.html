@@ -19,13 +19,11 @@
   <!-- ═══ 0. LANGUAGE SELECTION ═══ -->
   <div id="v-lang" class="lang-overlay">
     <div class="lang-card">
-      <div class="lang-logo">
-        <img src="{% static 'images/logo.png' %}" alt="FE">
-      </div>
-      <h2>Tilni tanlang / <span class="ru">Выберите язык</span></h2>
+      <h2>Tilni tanlang / Выберите язык / Select language</h2>
       <div class="lang-opts">
         <button onclick="setLang('uz')">🇺🇿 O'zbek tili</button>
         <button onclick="setLang('ru')">🇷🇺 Русский язык</button>
+        <button onclick="setLang('en')">🇬🇧 English</button>
       </div>
     </div>
   </div>
@@ -48,33 +46,45 @@
         </div>
       </div>
       <div class="register-right">
-        <div class="register-card">
-          <h2>Ro'yxatdan o'tish <span class="sub-ru">/ Регистрация</span></h2>
-          <p class="form-hint">Imtihonni boshlash uchun ma'lumotlaringizni kiriting<br><span class="ru">Введите данные
-              для начала экзамена</span></p>
-          <div class="form-row">
-            <div class="fg">
-              <label for="inp-first">Ism / <span class="ru">Имя</span></label>
-              <input type="text" id="inp-first" placeholder="Ismingiz / Ваше имя" autocomplete="off">
-            </div>
-            <div class="fg">
-              <label for="inp-last">Familiya / <span class="ru">Фамилия</span></label>
-              <input type="text" id="inp-last" placeholder="Familiyangiz / Ваша фамилия" autocomplete="off">
+        <div class="register-top-bar">
+          <div class="lang-switcher">
+            <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M6 9l6 6 6-6" />
+              </svg></button>
+            <div class="lang-switcher-menu">
+              <button data-lang="uz">🇺🇿 O'zbek tili</button>
+              <button data-lang="ru">🇷🇺 Русский язык</button>
+              <button data-lang="en">🇬🇧 English</button>
             </div>
           </div>
-          <div class="form-sep">O'qituvchi / <span class="ru">Учитель</span></div>
+        </div>
+        <div class="register-card">
+          <h2>Ro'yxatdan o'tish</h2>
+          <p class="form-hint">Imtihonni boshlash uchun ma'lumotlaringizni kiriting</p>
           <div class="form-row">
             <div class="fg">
-              <label for="inp-tfirst">O'qituvchi ismi / <span class="ru">Имя учителя</span></label>
+              <label for="inp-first">Ism</label>
+              <input type="text" id="inp-first" placeholder="Ismingiz" autocomplete="off">
+            </div>
+            <div class="fg">
+              <label for="inp-last">Familiya</label>
+              <input type="text" id="inp-last" placeholder="Familiyangiz" autocomplete="off">
+            </div>
+          </div>
+          <div class="form-sep">O'qituvchi</div>
+          <div class="form-row">
+            <div class="fg">
+              <label for="inp-tfirst">O'qituvchi ismi</label>
               <input type="text" id="inp-tfirst" placeholder="O'qituvchi ismi" autocomplete="off">
             </div>
             <div class="fg">
-              <label for="inp-tlast">Familiyasi / <span class="ru">Фамилия</span></label>
+              <label for="inp-tlast">Familiyasi</label>
               <input type="text" id="inp-tlast" placeholder="O'qituvchi familiyasi" autocomplete="off">
             </div>
           </div>
           <button id="btn-register" class="btn-primary" disabled>
-            <span>Boshlash / Начать</span>
+            <span>Boshlash</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7" />
@@ -89,13 +99,25 @@
   <section id="v-levels" class="scene">
     <nav class="top-nav">
       <div class="nav-brand">Fast Education</div>
-      <div class="nav-user" id="nav-user"></div>
+      <div class="nav-right-group">
+        <div class="lang-switcher">
+          <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" />
+            </svg></button>
+          <div class="lang-switcher-menu">
+            <button data-lang="uz">🇺🇿 O'zbek tili</button>
+            <button data-lang="ru">🇷🇺 Русский язык</button>
+            <button data-lang="en">🇬🇧 English</button>
+          </div>
+        </div>
+        <div class="nav-user" id="nav-user"></div>
+      </div>
     </nav>
     <div class="page-wrap">
       <div class="page-head">
-        <h1>Darajangizni tanlang / <span class="ru">Выберите уровень</span></h1>
-        <p>Mos darajani tanlang va testlarni boshlang / <span class="ru">Выберите подходящий уровень и начните
-            тесты</span></p>
+        <h1>Darajangizni tanlang</h1>
+        <p>Mos darajani tanlang va testlarni boshlang</p>
       </div>
       <div id="levels-grid" class="levels-grid"></div>
     </div>
@@ -105,7 +127,20 @@
   <section id="v-months" class="scene">
     <nav class="top-nav">
       <div class="nav-brand">Fast Education</div>
-      <div class="nav-user" id="nav-user2"></div>
+      <div class="nav-right-group">
+        <div class="lang-switcher">
+          <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" />
+            </svg></button>
+          <div class="lang-switcher-menu">
+            <button data-lang="uz">🇺🇿 O'zbek tili</button>
+            <button data-lang="ru">🇷🇺 Русский язык</button>
+            <button data-lang="en">🇬🇧 English</button>
+          </div>
+        </div>
+        <div class="nav-user" id="nav-user2"></div>
+      </div>
     </nav>
     <div class="page-wrap">
       <button class="back-link" id="btn-back-levels">
@@ -113,13 +148,13 @@
           stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
-        Ortga / Назад
+        Ortga
       </button>
       <div class="month-header" id="month-header">
         <div class="month-icon" id="month-icon"></div>
         <div>
           <h1 id="month-level-name"></h1>
-          <p>Oy tanlang va testlarni boshlang / <span class="ru">Выберите месяц и начните тесты</span></p>
+          <p>Oy tanlang va testlarni boshlang</p>
         </div>
       </div>
       <div id="months-grid" class="months-grid"></div>
@@ -139,6 +174,17 @@
         </div>
       </div>
       <div class="eb-right">
+        <div class="lang-switcher">
+          <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5">
+              <path d="M6 9l6 6 6-6" />
+            </svg></button>
+          <div class="lang-switcher-menu">
+            <button data-lang="uz">🇺🇿 O'zbek tili</button>
+            <button data-lang="ru">🇷🇺 Русский язык</button>
+            <button data-lang="en">🇬🇧 English</button>
+          </div>
+        </div>
         <span class="eb-user" id="user-lbl"></span>
         <span class="eb-timer" id="timer-t">00:00</span>
       </div>
@@ -154,9 +200,9 @@
         <div id="q-body"></div>
       </div>
       <div class="nav-row">
-        <button class="btn-ghost" id="nav-prev" disabled>&#8592; Oldingi / Назад</button>
-        <button class="btn-primary" id="nav-next">Keyingi / Далее &#8594;</button>
-        <button class="btn-submit" id="nav-submit" hidden>Topshirish / Сдать</button>
+        <button class="btn-ghost" id="nav-prev" disabled>&#8592; Oldingi</button>
+        <button class="btn-primary" id="nav-next">Keyingi &#8594;</button>
+        <button class="btn-submit" id="nav-submit" hidden>Topshirish</button>
       </div>
     </main>
     <footer class="dots-bar" id="dots-bar"></footer>
@@ -181,23 +227,23 @@
     <div class="res-wrap">
       <div class="res-header">
         <img src="{% static 'images/logo.png' %}" alt="FE" class="res-logo-img">
-        <h1>Natijalar / <span class="ru">Результаты</span></h1>
+        <h1>Natijalar</h1>
         <p id="res-name"></p>
       </div>
       <div class="score-card">
         <div class="ring" id="ring">
           <span class="ring-val" id="ring-val">0%</span>
-          <span class="ring-lbl">Ball / Балл</span>
+          <span class="ring-lbl">Ball</span>
         </div>
         <div class="score-stats">
-          <div class="ss"><b id="rs-correct">0</b><small>To'g'ri / Правильно</small></div>
-          <div class="ss"><b id="rs-total">0</b><small>Jami / Всего</small></div>
-          <div class="ss"><b id="rs-time">00:00</b><small>Vaqt / Время</small></div>
+          <div class="ss"><b id="rs-correct">0</b><small>To'g'ri</small></div>
+          <div class="ss"><b id="rs-total">0</b><small>Jami</small></div>
+          <div class="ss"><b id="rs-time">00:00</b><small>Vaqt</small></div>
         </div>
       </div>
       <div class="res-actions">
-        <button class="btn-cert" id="btn-cert" onclick="openCert()">📄 Sertifikat / Сертификат</button>
-        <button class="btn-primary" onclick="location.reload()">Boshqa test / Новый тест</button>
+        <button class="btn-cert" id="btn-cert" onclick="openCert()">📄 Sertifikat</button>
+        <button class="btn-primary" onclick="location.reload()">Boshqa test</button>
       </div>
       <div class="rev-tabs" id="review-tabs"></div>
       <div id="review-area"></div>
