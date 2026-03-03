@@ -1,0 +1,39 @@
+{% extends "panel/base.html" %}
+{% block title %}O'qituvchilar{% endblock %}
+{% block content %}
+<div class="page-hd">
+    <h1>👨‍🏫 O'qituvchilar</h1>
+</div>
+<div class="tw">
+    <table>
+        <thead>
+            <tr>
+                <th>Ism</th>
+                <th>Familiya</th>
+                <th>Talabalar</th>
+                <th>Status</th>
+                <th>Qo'shilgan</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in teachers %}
+            <tr>
+                <td style="font-weight:600;color:#fff">{{ item.teacher.first_name }}</td>
+                <td style="color:#cbd5e1">{{ item.teacher.last_name }}</td>
+                <td>{{ item.student_count }} ta</td>
+                <td>{% if item.teacher.is_active %}<span class="badge bg-green">Faol</span>{% else %}<span
+                        class="badge bg-gray">Nofaol</span>{% endif %}</td>
+                <td style="color:#64748b">{{ item.teacher.created_at|date:"d M Y, H:i" }}</td>
+                <td class="acell">
+                    <a href="/admin/teachers/{{ item.teacher.pk }}/delete/" class="btn btn-d btn-sm"
+                        onclick="return confirm('O\'chirishga ishonchingiz kommi?')">🗑</a>
+                </td>
+            </tr>
+            {% empty %}<tr>
+                <td colspan="6" class="empty">O'qituvchilar yo'q</td>
+            </tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -495,3 +495,17 @@ def certificate_view(request, session_id):
         'stamp_url': stamp_url,
         'answers': answers,
     })
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_site_settings(request):
+    settings_obj = SiteSettings.load()
+    data = {
+        'site_name': settings_obj.site_name,
+        'tagline': settings_obj.tagline,
+        'logo_url': settings_obj.logo.url if settings_obj.logo else None,
+        'hero_image_url': settings_obj.hero_image.url if settings_obj.hero_image else None,
+    }
+    return JsonResponse({'success': True, **data})
+

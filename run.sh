@@ -35,12 +35,8 @@ pip install -r "$BACKEND_DIR/requirements.txt" 2>&1 | tail -3
 
 cd "$BACKEND_DIR"
 
-if [ -f db.sqlite3 ]; then
-    echo "  Removing old database (schema changed)..."
-    rm -f db.sqlite3
-fi
-
 echo "  Running migrations..."
+python manage.py makemigrations --noinput 2>&1 | tail -3
 python manage.py migrate --run-syncdb 2>&1 | tail -3
 
 echo "  Setting up data..."
@@ -55,25 +51,38 @@ fi
 
 echo ""
 echo "  Starting Django server..."
-python manage.py runserver "0.0.0.0:$PORT" &
+python manage.py runserver "0.0.0.0:$PORT" > /dev/null 2>&1 &
 DJANGO_PID=$!
 sleep 2
 
 echo "  Starting public tunnel..."
 echo ""
-$CLOUDFLARED tunnel --url "http://localhost:$PORT" 2>&1 &
+
+# Capture cloudflared output to extract the URL
+TUNNEL_LOG="/tmp/cloudflared_output.log"
+$CLOUDFLARED tunnel --url "http://localhost:$PORT" > "$TUNNEL_LOG" 2>&1 &
 TUNNEL_PID=$!
-sleep 4
+
+# Wait for the URL to appear in the log
+PUBLIC_URL=""
+for i in $(seq 1 15); do
+    sleep 1
+    PUBLIC_URL=$(grep -oP 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' "$TUNNEL_LOG" 2>/dev/null | head -1)
+    if [ -n "$PUBLIC_URL" ]; then
+        break
+    fi
+done
+
+if [ -z "$PUBLIC_URL" ]; then
+    PUBLIC_URL="(kutilmoqda... / waiting...)"
+fi
 
 echo ""
 echo "  ┌──────────────────────────────────────────────────────────┐"
 echo "  │                                                          │"
-echo "  │  LOCAL:   http://localhost:$PORT                         │"
-echo "  │  ADMIN:   http://localhost:$PORT/admin                   │"
-echo "  │  LOGIN:   admin / admin123                               │"
-echo "  │                                                          │"
-echo "  │  PUBLIC LINK yuqorida ko'rsatilgan                       │"
-echo "  │  (https://xxx.trycloudflare.com)                         │"
+echo "  │  🌐 SAYT:    $PUBLIC_URL"
+echo "  │  🔐 ADMIN:   ${PUBLIC_URL}/admin"
+echo "  │  👤 LOGIN:   admin / admin123                            │"
 echo "  │                                                          │"
 echo "  │  Shu linkni do'stlaringizga yuboring!                    │"
 echo "  │                                                          │"
@@ -88,6 +97,7 @@ cleanup() {
     kill $TUNNEL_PID 2>/dev/null
     wait $DJANGO_PID 2>/dev/null
     wait $TUNNEL_PID 2>/dev/null
+    rm -f "$TUNNEL_LOG"
     echo "  Done!"
 }
 trap cleanup EXIT INT TERM

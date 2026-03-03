@@ -1,51 +1,117 @@
 {% extends "panel/base.html" %}
-{% block title %}{% if question %}Edit{% else %}Add{% endif %} Question{% endblock %}
+{% block title %}{% if question %}Savolni tahrirlash{% else %}Yangi savol{% endif %}{% endblock %}
 {% block content %}
-<div class="page-hd"><h1>{% if question %}Edit Question #{{ question.id }}{% else %}New Question{% endif %}</h1></div>
+<div class="page-hd">
+  <h1>{% if question %}✏️ Savol #{{ question.pk }}{% else %}❓ Yangi savol{% endif %}</h1>
+  <a href="/admin/questions/" class="btn btn-g">← Ortga</a>
+</div>
+<form method="post">
+  {% csrf_token %}
+  <div class="fcard">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="fg">
+        <label>Daraja</label>
+        <select name="level" class="fc" required id="sel-level">
+          <option value="">Tanlang...</option>
+          {% for lv in levels %}
+          <option value="{{ lv.pk }}" {% if question.level_id==lv.pk %}selected{% endif %}>{{ lv.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Oy</label>
+        <select name="month" class="fc" required id="sel-month">
+          <option value="">Tanlang...</option>
+          {% for m in months %}
+          <option value="{{ m.pk }}" data-level="{{ m.level_id }}" {% if question.month_id==m.pk %}selected{% endif %}>
+            {{ m }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg">
+        <label>Kategoriya</label>
+        <select name="category" class="fc" required>
+          <option value="">Tanlang...</option>
+          {% for c in categories %}
+          <option value="{{ c.pk }}" {% if question.category_id==c.pk %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
 
-<div class="fcard">
-<form method="post">{% csrf_token %}
-  <div class="fg"><label>Category</label>
-    <select name="category" class="fc" required>
-      {% for c in categories %}<option value="{{ c.id }}" {% if question and question.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
-    </select></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="fg">
+        <label>Savol turi</label>
+        <select name="question_type" class="fc" required>
+          <option value="multiple_choice" {% if question.question_type=='multiple_choice' %}selected{% endif %}>Multiple
+            Choice</option>
+          <option value="translation" {% if question.question_type=='translation' %}selected{% endif %}>Translation
+          </option>
+          <option value="writing" {% if question.question_type=='writing' %}selected{% endif %}>Writing</option>
+          <option value="vocabulary" {% if question.question_type=='vocabulary' %}selected{% endif %}>Vocabulary
+          </option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Ball</label>
+        <input type="number" name="points" class="fc" value="{{ question.points|default:1 }}">
+      </div>
+    </div>
 
-  <div class="fg"><label>Type</label>
-    <select name="question_type" class="fc" required>
-      <option value="multiple_choice" {% if question.question_type == 'multiple_choice' %}selected{% endif %}>Multiple Choice</option>
-      <option value="vocabulary" {% if question.question_type == 'vocabulary' %}selected{% endif %}>Vocabulary</option>
-      <option value="translation" {% if question.question_type == 'translation' %}selected{% endif %}>Translation</option>
-      <option value="writing" {% if question.question_type == 'writing' %}selected{% endif %}>Writing</option>
-    </select></div>
+    <div class="fg">
+      <label>Savol matni</label>
+      <textarea name="question_text" class="fc" rows="3" required>{{ question.question_text|default:'' }}</textarea>
+    </div>
+    <div class="fg">
+      <label>Ko'rsatma (ixtiyoriy)</label>
+      <textarea name="instructions" class="fc" rows="2">{{ question.instructions|default:'' }}</textarea>
+    </div>
 
-  <div class="fg"><label>Question Text</label>
-    <textarea name="question_text" class="fc" rows="3" required>{{ question.question_text|default:"" }}</textarea></div>
+    <div class="fg">
+      <label>Javob variantlari (multiple choice / vocabulary uchun)</label>
+      {% for i in "012345" %}
+      {% with opt_idx=i|add:"0" %}
+      <input type="text" name="option_{{ forloop.counter0 }}" class="fc" style="margin-bottom:6px"
+        placeholder="Variant {{ forloop.counter }}"
+        value="{% if question.options %}{% for o in question.options %}{% if forloop.counter0 == forloop.parentloop.counter0 %}{{ o }}{% endif %}{% endfor %}{% endif %}">
+      {% endwith %}
+      {% endfor %}
+    </div>
 
-  <div class="fg"><label>Instructions</label>
-    <textarea name="instructions" class="fc" rows="2">{{ question.instructions|default:"" }}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div class="fg">
+        <label>To'g'ri javob indeksi (0 dan)</label>
+        <input type="number" name="correct_answer_index" class="fc"
+          value="{{ question.correct_answer_index|default:'' }}" min="0" max="5">
+      </div>
+      <div class="fg">
+        <label>Min so'zlar (writing uchun)</label>
+        <input type="number" name="min_words" class="fc" value="{{ question.min_words|default:0 }}">
+      </div>
+      <div class="fg">
+        <label>Tartib</label>
+        <input type="number" name="order" class="fc" value="{{ question.order|default:0 }}">
+      </div>
+    </div>
 
-  <div style="padding:16px 0 8px;font-size:13px;font-weight:600;color:#a78bfa">Options (for multiple choice / vocabulary)</div>
-  {% for i in "0123" %}
-  <div class="fg" style="margin-bottom:8px">
-    <input name="option_{{ forloop.counter0 }}" class="fc" placeholder="Option {{ forloop.counter }}"
-      value="{% if question and question.options and question.options|length > forloop.counter0 %}{% with idx=forloop.counter0 %}{% if idx == 0 %}{{ question.options.0 }}{% elif idx == 1 %}{{ question.options.1 }}{% elif idx == 2 %}{{ question.options.2 }}{% elif idx == 3 %}{{ question.options.3 }}{% endif %}{% endwith %}{% endif %}">
-  </div>{% endfor %}
+    <label class="fcheck">
+      <input type="checkbox" name="is_active" {% if question.is_active or not question %}checked{% endif %}>
+      Faol
+    </label>
 
-  <div class="fg"><label>Correct Answer Index (0-based)</label>
-    <input type="number" name="correct_answer_index" class="fc" min="0" max="5" value="{{ question.correct_answer_index|default:"" }}"></div>
-
-  <div style="display:flex;gap:14px">
-    <div class="fg" style="flex:1"><label>Points</label><input type="number" name="points" class="fc" value="{{ question.points|default:1 }}" min="1"></div>
-    <div class="fg" style="flex:1"><label>Min Words</label><input type="number" name="min_words" class="fc" value="{{ question.min_words|default:0 }}"></div>
-    <div class="fg" style="flex:1"><label>Order</label><input type="number" name="order" class="fc" value="{{ question.order|default:0 }}"></div>
-  </div>
-
-  <div class="fg"><label class="fcheck"><input type="checkbox" name="is_active" {% if question.is_active or not question %}checked{% endif %}> Active</label></div>
-
-  <div style="display:flex;gap:12px">
-    <button type="submit" class="btn btn-p">{% if question %}Save{% else %}Create{% endif %}</button>
-    <a href="/admin/questions/" class="btn btn-g">Cancel</a>
+    <button type="submit" class="btn btn-p" style="margin-top:20px">💾 Saqlash</button>
   </div>
 </form>
-</div>
+
+<script>
+  // Filter months by selected level
+  document.getElementById('sel-level').addEventListener('change', function () {
+    const levelId = this.value;
+    const monthSel = document.getElementById('sel-month');
+    Array.from(monthSel.options).forEach(opt => {
+      if (!opt.value) return;
+      opt.style.display = (!levelId || opt.dataset.level === levelId) ? '' : 'none';
+    });
+  });
+</script>
 {% endblock %}

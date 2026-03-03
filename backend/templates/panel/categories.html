@@ -1,22 +1,42 @@
 {% extends "panel/base.html" %}
-{% block title %}Categories{% endblock %}
+{% block title %}Kategoriyalar{% endblock %}
 {% block content %}
-<div class="page-hd"><h1>Categories</h1><a href="/admin/categories/add/" class="btn btn-p">+ Add</a></div>
+<div class="page-hd">
+  <h1>🏷 Kategoriyalar</h1>
+  <a href="/admin/categories/add/" class="btn btn-p">+ Yangi kategoriya</a>
+</div>
 <div class="tw">
-<table>
-<thead><tr><th>Name</th><th>Slug</th><th>Order</th><th>Questions</th><th>Status</th><th></th></tr></thead>
-<tbody>
-{% for c in categories %}
-<tr>
-  <td style="font-weight:600;color:#fff">{{ c.name }}</td>
-  <td style="font-family:monospace;font-size:13px;color:#64748b">{{ c.slug }}</td>
-  <td>{{ c.order }}</td>
-  <td>{{ c.questions.count }}</td>
-  <td>{% if c.is_active %}<span class="badge bg-green">Active</span>{% else %}<span class="badge bg-gray">Off</span>{% endif %}</td>
-  <td><a href="/admin/categories/{{ c.pk }}/edit/" class="btn btn-sm btn-g">Edit</a></td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+  <table>
+    <thead>
+      <tr>
+        <th>Nomi</th>
+        <th>Slug</th>
+        <th>Tavsif</th>
+        <th>Tartib</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td style="font-weight:600;color:#fff">{{ c.name }}</td>
+        <td style="color:#64748b">{{ c.slug }}</td>
+        <td style="color:#94a3b8;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{
+          c.description|default:"—" }}</td>
+        <td>{{ c.order }}</td>
+        <td>{% if c.is_active %}<span class="badge bg-green">Faol</span>{% else %}<span
+            class="badge bg-gray">Nofaol</span>{% endif %}</td>
+        <td class="acell">
+          <a href="/admin/categories/{{ c.pk }}/edit/" class="btn btn-g btn-sm">✏️</a>
+          <a href="/admin/categories/{{ c.pk }}/delete/" class="btn btn-d btn-sm"
+            onclick="return confirm('O\'chirishga ishonchingiz kommi?')">🗑</a>
+        </td>
+      </tr>
+      {% empty %}<tr>
+        <td colspan="6" class="empty">Kategoriyalar yo'q</td>
+      </tr>{% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

@@ -1,0 +1,49 @@
+{% extends "panel/base.html" %}
+{% block title %}Darajalar{% endblock %}
+{% block content %}
+<div class="page-hd">
+    <h1>📊 Darajalar</h1>
+    <a href="/admin/levels/add/" class="btn btn-p">+ Yangi daraja</a>
+</div>
+<div class="tw">
+    <table>
+        <thead>
+            <tr>
+                <th>Icon</th>
+                <th>Nomi</th>
+                <th>Slug</th>
+                <th>Rasm</th>
+                <th>Rang</th>
+                <th>Tartib</th>
+                <th>Status</th>
+                <th>Savollar</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lv in levels %}
+            <tr>
+                <td style="font-size:20px">{{ lv.icon }}</td>
+                <td style="font-weight:600;color:#fff">{{ lv.name }}</td>
+                <td style="color:#64748b">{{ lv.slug }}</td>
+                <td>{% if lv.image %}<img src="{{ lv.image.url }}"
+                        style="width:50px;height:35px;object-fit:cover;border-radius:6px;border:1px solid rgba(255,255,255,.1)">{%
+                    else %}<span style="color:#475569">—</span>{% endif %}</td>
+                <td><span class="color-swatch" style="background:{{ lv.color }}"></span></td>
+                <td>{{ lv.order }}</td>
+                <td>{% if lv.is_active %}<span class="badge bg-green">Faol</span>{% else %}<span
+                        class="badge bg-gray">Nofaol</span>{% endif %}</td>
+                <td>{{ lv.question_count }} ta</td>
+                <td class="acell">
+                    <a href="/admin/levels/{{ lv.pk }}/edit/" class="btn btn-g btn-sm">✏️</a>
+                    <a href="/admin/levels/{{ lv.pk }}/delete/" class="btn btn-d btn-sm"
+                        onclick="return confirm('O\'chirishga ishonchingiz kommi?')">🗑</a>
+                </td>
+            </tr>
+            {% empty %}<tr>
+                <td colspan="9" class="empty">Darajalar yo'q</td>
+            </tr>{% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

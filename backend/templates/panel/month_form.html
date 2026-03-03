@@ -1,0 +1,37 @@
+{% extends "panel/base.html" %}
+{% block title %}{% if month %}Oyni tahrirlash{% else %}Yangi oy{% endif %}{% endblock %}
+{% block content %}
+<div class="page-hd">
+    <h1>{% if month %}✏️ {{ month }}{% else %}📅 Yangi oy{% endif %}</h1>
+    <a href="/admin/months/" class="btn btn-g">← Ortga</a>
+</div>
+<form method="post">
+    {% csrf_token %}
+    <div class="fcard">
+        <div class="fg">
+            <label>Daraja</label>
+            <select name="level" class="fc" required>
+                <option value="">Tanlang...</option>
+                {% for lv in levels %}
+                <option value="{{ lv.pk }}" {% if month.level_id==lv.pk %}selected{% endif %}>{{ lv.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="fg">
+                <label>Oy raqami</label>
+                <input type="number" name="number" class="fc" value="{{ month.number|default:1 }}" required min="1">
+            </div>
+            <div class="fg">
+                <label>Nomi</label>
+                <input type="text" name="name" class="fc" value="{{ month.name|default:'' }}" required>
+            </div>
+        </div>
+        <label class="fcheck">
+            <input type="checkbox" name="is_active" {% if month.is_active or not month %}checked{% endif %}>
+            Faol
+        </label>
+        <button type="submit" class="btn btn-p" style="margin-top:20px">💾 Saqlash</button>
+    </div>
+</form>
+{% endblock %}

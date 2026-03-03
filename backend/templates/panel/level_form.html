@@ -1,0 +1,60 @@
+{% extends "panel/base.html" %}
+{% block title %}{% if level %}Darajani tahrirlash{% else %}Yangi daraja{% endif %}{% endblock %}
+{% block content %}
+<div class="page-hd">
+    <h1>{% if level %}✏️ {{ level.name }}{% else %}📊 Yangi daraja{% endif %}</h1>
+    <a href="/admin/levels/" class="btn btn-g">← Ortga</a>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="fcard">
+        <div class="fg">
+            <label>Nomi</label>
+            <input type="text" name="name" class="fc" value="{{ level.name|default:'' }}" required>
+        </div>
+        <div class="fg">
+            <label>Slug (URL uchun)</label>
+            <input type="text" name="slug" class="fc" value="{{ level.slug|default:'' }}" required>
+        </div>
+        <div class="fg">
+            <label>Tavsif</label>
+            <textarea name="description" class="fc">{{ level.description|default:'' }}</textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+            <div class="fg">
+                <label>Tartib raqami</label>
+                <input type="number" name="order" class="fc" value="{{ level.order|default:0 }}">
+            </div>
+            <div class="fg">
+                <label>Rang</label>
+                <input type="color" name="color" value="{{ level.color|default:'#002147' }}"
+                    style="width:100%;height:42px;border:none;border-radius:8px;cursor:pointer">
+            </div>
+            <div class="fg">
+                <label>Icon (emoji)</label>
+                <input type="text" name="icon" class="fc" value="{{ level.icon|default:'📚' }}">
+            </div>
+        </div>
+
+        <div class="fg">
+            <label>🖼 Daraja rasmi</label>
+            <div class="img-upload-wrap">
+                {% if level.image %}
+                <img src="{{ level.image.url }}" class="img-preview"><br>
+                <label class="remove-btn"><input type="checkbox" name="remove_image" value="1" hidden
+                        onclick="this.parentElement.style.color='#fff'"> ✕ O'chirish</label><br>
+                {% endif %}
+                <input type="file" name="image" accept="image/*">
+            </div>
+        </div>
+
+        <label class="fcheck">
+            <input type="checkbox" name="is_active" {% if level.is_active or not level %}checked{% endif %}>
+            Faol
+        </label>
+
+        <button type="submit" class="btn btn-p" style="margin-top:20px">💾 Saqlash</button>
+    </div>
+</form>
+{% endblock %}

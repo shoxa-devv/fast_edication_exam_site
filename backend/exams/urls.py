@@ -11,4 +11,6 @@ urlpatterns = [
          views.get_vocabulary, name='vocabulary'),
     path('submit-exam/', views.submit_exam, name='submit_exam'),
     path('check-ai/', views.check_ai, name='check_ai'),
+    path('site-settings/', views.get_site_settings, name='site_settings'),
 ]
+

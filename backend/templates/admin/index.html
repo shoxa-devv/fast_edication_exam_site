@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Admin Panel | Fast Education{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="fe-admin-dashboard">
+  <div class="fe-admin-head">
+    <span class="fe-admin-head-icon">⚙</span>
+    <h1>Admin Panel</h1>
+  </div>
+  <div class="fe-admin-grid">
+    <a href="{% url 'admin:exams_student_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📋</span>
+      <span class="fe-admin-card-label">Talabalar</span>
+    </a>
+    <a href="{% url 'admin:exams_teacher_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">👥</span>
+      <span class="fe-admin-card-label">O'qituvchilar</span>
+    </a>
+    <a href="{% url 'admin:exams_examsession_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">⭐</span>
+      <span class="fe-admin-card-label">Imtihonlar</span>
+    </a>
+    <a href="{% url 'admin:exams_level_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📚</span>
+      <span class="fe-admin-card-label">Darajalar</span>
+    </a>
+    <a href="{% url 'admin:exams_month_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📅</span>
+      <span class="fe-admin-card-label">Oylar</span>
+    </a>
+    <a href="{% url 'admin:exams_question_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📝</span>
+      <span class="fe-admin-card-label">Savollar</span>
+    </a>
+    <a href="{% url 'admin:exams_category_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📁</span>
+      <span class="fe-admin-card-label">Kategoriyalar</span>
+    </a>
+    <a href="{% url 'admin:exams_vocabularyword_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">📖</span>
+      <span class="fe-admin-card-label">Lug'at</span>
+    </a>
+    <a href="{% url 'admin:exams_sitesettings_changelist' %}" class="fe-admin-card">
+      <span class="fe-admin-card-icon">🖼</span>
+      <span class="fe-admin-card-label">Sayt sozlamalari</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

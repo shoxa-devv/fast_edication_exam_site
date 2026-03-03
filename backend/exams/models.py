@@ -8,6 +8,7 @@ class SiteSettings(models.Model):
     tagline = models.CharField(max_length=300, default='English Language Assessment Centre')
     certificate_bg = models.ImageField(upload_to='site/', blank=True, null=True, help_text="Sertifikat fon rasmi")
     certificate_stamp = models.ImageField(upload_to='site/', blank=True, null=True, help_text="Sertifikat muhri/shtampi")
+    hero_image = models.ImageField(upload_to='site/', blank=True, null=True, help_text="Kirish sahifasi fon rasmi")
 
     class Meta:
         verbose_name = "Sayt sozlamalari"

@@ -1,0 +1,85 @@
+{% extends "panel/base.html" %}
+{% block title %}Sozlamalar{% endblock %}
+{% block content %}
+<div class="page-hd">
+    <h1>⚙️ Sayt Sozlamalari</h1>
+</div>
+
+{% if saved %}
+<div class="alert alert-ok">✅ Sozlamalar muvaffaqiyatli saqlandi!</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="fcard" style="max-width:900px">
+
+        <div class="fg">
+            <label>Sayt nomi</label>
+            <input type="text" name="site_name" class="fc" value="{{ settings.site_name }}">
+        </div>
+
+        <div class="fg">
+            <label>Tagline</label>
+            <input type="text" name="tagline" class="fc" value="{{ settings.tagline }}">
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.06);margin:28px 0">
+
+        <!-- Logo -->
+        <div class="fg">
+            <label>🖼 Logo</label>
+            <div class="img-upload-wrap">
+                {% if settings.logo %}
+                <img src="{{ settings.logo.url }}" class="img-preview"><br>
+                <label class="remove-btn"><input type="checkbox" name="remove_logo" value="1" hidden
+                        onclick="this.parentElement.style.color='#fff'"> ✕ O'chirish</label><br>
+                {% endif %}
+                <input type="file" name="logo" accept="image/*">
+            </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="fg">
+            <label>🏠 Kirish sahifasi rasmi (Hero Image)</label>
+            <div class="img-upload-wrap">
+                {% if settings.hero_image %}
+                <img src="{{ settings.hero_image.url }}" class="img-preview" style="max-width:300px"><br>
+                <label class="remove-btn"><input type="checkbox" name="remove_hero_image" value="1" hidden
+                        onclick="this.parentElement.style.color='#fff'"> ✕ O'chirish</label><br>
+                {% endif %}
+                <input type="file" name="hero_image" accept="image/*">
+            </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.06);margin:28px 0">
+
+        <!-- Certificate BG -->
+        <div class="fg">
+            <label>📄 Sertifikat fon rasmi</label>
+            <div class="img-upload-wrap">
+                {% if settings.certificate_bg %}
+                <img src="{{ settings.certificate_bg.url }}" class="img-preview" style="max-width:300px"><br>
+                <label class="remove-btn"><input type="checkbox" name="remove_certificate_bg" value="1" hidden
+                        onclick="this.parentElement.style.color='#fff'"> ✕ O'chirish</label><br>
+                {% endif %}
+                <input type="file" name="certificate_bg" accept="image/*">
+            </div>
+        </div>
+
+        <!-- Certificate Stamp -->
+        <div class="fg">
+            <label>🔏 Sertifikat muhri (Stamp)</label>
+            <div class="img-upload-wrap">
+                {% if settings.certificate_stamp %}
+                <img src="{{ settings.certificate_stamp.url }}" class="img-preview"><br>
+                <label class="remove-btn"><input type="checkbox" name="remove_certificate_stamp" value="1" hidden
+                        onclick="this.parentElement.style.color='#fff'"> ✕ O'chirish</label><br>
+                {% endif %}
+                <input type="file" name="certificate_stamp" accept="image/*">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-p" style="margin-top:12px">💾 Saqlash</button>
+    </div>
+</form>
+{% endblock %}

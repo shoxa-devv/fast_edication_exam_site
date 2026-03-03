@@ -9,5 +9,13 @@
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">Fast Education — Admin Panel</a></h1>
+<div id="branding-wrap">
+  <h1 id="site-name"><a href="{% url 'admin:index' %}">Fast Education</a></h1>
+  {% block nav-global %}
+  <nav class="fe-admin-nav">
+    <a href="{% url 'admin:index' %}">Bosh sahifa</a>
+    <a href="/">Saytga o'tish</a>
+  </nav>
+  {% endblock %}
+</div>
 {% endblock %}

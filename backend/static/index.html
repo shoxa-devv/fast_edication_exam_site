@@ -1,167 +1,202 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Fast Education — English Language Assessment</title>
-<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Fast Education — English Language Assessment</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
 
-<!-- ═══ 1. REGISTRATION ═══ -->
-<section id="v-register" class="scene active">
-  <div class="register-page">
-    <div class="register-left">
-      <div class="reg-bg-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-      </div>
-      <div class="brand-block">
-        <div class="brand-logo">
-          <img src="{% static 'images/logo.png' %}" alt="Fast Education" class="logo-img">
+  <!-- ═══ 1. REGISTRATION ═══ -->
+  <section id="v-register" class="scene active">
+    <div class="register-page">
+      <div class="register-left">
+        <div class="reg-bg-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
         </div>
-        <h1 class="brand-name">Fast<br>Education</h1>
-        <p class="brand-tagline">English Language Assessment Centre</p>
-      </div>
-    </div>
-    <div class="register-right">
-      <div class="register-card">
-        <h2>Ro'yxatdan o'tish <span class="sub-ru">/ Регистрация</span></h2>
-        <p class="form-hint">Imtihonni boshlash uchun ma'lumotlaringizni kiriting<br><span class="ru">Введите данные для начала экзамена</span></p>
-        <div class="form-row">
-          <div class="fg">
-            <label for="inp-first">Ism / <span class="ru">Имя</span></label>
-            <input type="text" id="inp-first" placeholder="Ismingiz / Ваше имя" autocomplete="off">
+        <div class="brand-block">
+          <div class="brand-logo">
+            <img src="{% static 'images/logo.png' %}" alt="Fast Education" class="logo-img">
           </div>
-          <div class="fg">
-            <label for="inp-last">Familiya / <span class="ru">Фамилия</span></label>
-            <input type="text" id="inp-last" placeholder="Familiyangiz / Ваша фамилия" autocomplete="off">
-          </div>
+          <h1 class="brand-name">Fast<br>Education</h1>
+          <p class="brand-tagline">English Language Assessment Centre</p>
         </div>
-        <div class="form-sep">O'qituvchi / <span class="ru">Учитель</span></div>
-        <div class="form-row">
-          <div class="fg">
-            <label for="inp-tfirst">O'qituvchi ismi / <span class="ru">Имя учителя</span></label>
-            <input type="text" id="inp-tfirst" placeholder="O'qituvchi ismi" autocomplete="off">
+      </div>
+      <div class="register-right">
+        <div class="register-card">
+          <h2>Ro'yxatdan o'tish <span class="sub-ru">/ Регистрация</span></h2>
+          <p class="form-hint">Imtihonni boshlash uchun ma'lumotlaringizni kiriting<br><span class="ru">Введите данные
+              для начала экзамена</span></p>
+          <div class="form-row">
+            <div class="fg">
+              <label for="inp-first">Ism / <span class="ru">Имя</span></label>
+              <input type="text" id="inp-first" placeholder="Ismingiz / Ваше имя" autocomplete="off">
+            </div>
+            <div class="fg">
+              <label for="inp-last">Familiya / <span class="ru">Фамилия</span></label>
+              <input type="text" id="inp-last" placeholder="Familiyangiz / Ваша фамилия" autocomplete="off">
+            </div>
           </div>
-          <div class="fg">
-            <label for="inp-tlast">Familiyasi / <span class="ru">Фамилия</span></label>
-            <input type="text" id="inp-tlast" placeholder="O'qituvchi familiyasi" autocomplete="off">
+          <div class="form-sep">O'qituvchi / <span class="ru">Учитель</span></div>
+          <div class="form-row">
+            <div class="fg">
+              <label for="inp-tfirst">O'qituvchi ismi / <span class="ru">Имя учителя</span></label>
+              <input type="text" id="inp-tfirst" placeholder="O'qituvchi ismi" autocomplete="off">
+            </div>
+            <div class="fg">
+              <label for="inp-tlast">Familiyasi / <span class="ru">Фамилия</span></label>
+              <input type="text" id="inp-tlast" placeholder="O'qituvchi familiyasi" autocomplete="off">
+            </div>
           </div>
+          <button id="btn-register" class="btn-primary" disabled>
+            <span>Boshlash / Начать</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
-        <button id="btn-register" class="btn-primary" disabled>
-          <span>Boshlash / Начать</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══ 2. LEVEL SELECTION ═══ -->
-<section id="v-levels" class="scene">
-  <nav class="top-nav">
-    <div class="nav-brand">Fast Education</div>
-    <div class="nav-user" id="nav-user"></div>
-  </nav>
-  <div class="page-wrap">
-    <div class="page-head">
-      <h1>Darajangizni tanlang / <span class="ru">Выберите уровень</span></h1>
-      <p>Mos darajani tanlang va testlarni boshlang / <span class="ru">Выберите подходящий уровень и начните тесты</span></p>
-    </div>
-    <div id="levels-grid" class="levels-grid"></div>
-  </div>
-</section>
-
-<!-- ═══ 3. MONTH SELECTION ═══ -->
-<section id="v-months" class="scene">
-  <nav class="top-nav">
-    <div class="nav-brand">Fast Education</div>
-    <div class="nav-user" id="nav-user2"></div>
-  </nav>
-  <div class="page-wrap">
-    <button class="back-link" id="btn-back-levels">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Ortga / Назад
-    </button>
-    <div class="month-header" id="month-header">
-      <div class="month-icon" id="month-icon"></div>
-      <div>
-        <h1 id="month-level-name"></h1>
-        <p>Oy tanlang va testlarni boshlang / <span class="ru">Выберите месяц и начните тесты</span></p>
+  <!-- ═══ 2. LEVEL SELECTION ═══ -->
+  <section id="v-levels" class="scene">
+    <nav class="top-nav">
+      <div class="nav-brand">Fast Education</div>
+      <div class="nav-user" id="nav-user"></div>
+    </nav>
+    <div class="page-wrap">
+      <div class="page-head">
+        <h1>Darajangizni tanlang / <span class="ru">Выберите уровень</span></h1>
+        <p>Mos darajani tanlang va testlarni boshlang / <span class="ru">Выберите подходящий уровень и начните
+            тесты</span></p>
       </div>
+      <div id="levels-grid" class="levels-grid"></div>
     </div>
-    <div id="months-grid" class="months-grid"></div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══ 4. EXAM ═══ -->
-<section id="v-exam" class="scene">
-  <header class="exam-bar">
-    <div class="eb-left">
-      <div class="eb-brand">Fast Education</div>
-      <span class="eb-badge" id="exam-badge"></span>
-    </div>
-    <div class="eb-progress">
-      <div class="eb-track"><div class="eb-fill" id="bar-fill"></div></div>
-    </div>
-    <div class="eb-right">
-      <span class="eb-user" id="user-lbl"></span>
-      <span class="eb-timer" id="timer-t">00:00</span>
-    </div>
-  </header>
-  <main class="exam-stage">
-    <div class="q-card" id="q-card">
-      <div class="q-top">
-        <span class="q-tag" id="q-tag"></span>
-        <span class="q-num" id="q-num"></span>
+  <!-- ═══ 3. MONTH SELECTION ═══ -->
+  <section id="v-months" class="scene">
+    <nav class="top-nav">
+      <div class="nav-brand">Fast Education</div>
+      <div class="nav-user" id="nav-user2"></div>
+    </nav>
+    <div class="page-wrap">
+      <button class="back-link" id="btn-back-levels">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Ortga / Назад
+      </button>
+      <div class="month-header" id="month-header">
+        <div class="month-icon" id="month-icon"></div>
+        <div>
+          <h1 id="month-level-name"></h1>
+          <p>Oy tanlang va testlarni boshlang / <span class="ru">Выберите месяц и начните тесты</span></p>
+        </div>
       </div>
-      <p class="q-inst" id="q-sub"></p>
-      <h2 class="q-title" id="q-title"></h2>
-      <div id="q-body"></div>
+      <div id="months-grid" class="months-grid"></div>
     </div>
-    <div class="nav-row">
-      <button class="btn-ghost" id="nav-prev" disabled>&#8592; Oldingi / Назад</button>
-      <button class="btn-primary" id="nav-next">Keyingi / Далее &#8594;</button>
-      <button class="btn-submit" id="nav-submit" hidden>Topshirish / Сдать</button>
-    </div>
-  </main>
-  <footer class="dots-bar" id="dots-bar"></footer>
-</section>
+  </section>
 
-<!-- ═══ 5. RESULTS ═══ -->
-<section id="v-results" class="scene">
-  <div class="res-wrap">
-    <div class="res-header">
-      <img src="{% static 'images/logo.png' %}" alt="FE" class="res-logo-img">
-      <h1>Natijalar / <span class="ru">Результаты</span></h1>
-      <p id="res-name"></p>
-    </div>
-    <div class="score-card">
-      <div class="ring" id="ring">
-        <span class="ring-val" id="ring-val">0%</span>
-        <span class="ring-lbl">Ball / Балл</span>
+  <!-- ═══ 4. EXAM ═══ -->
+  <section id="v-exam" class="scene">
+    <header class="exam-bar">
+      <div class="eb-left">
+        <div class="eb-brand">Fast Education</div>
+        <span class="eb-badge" id="exam-badge"></span>
       </div>
-      <div class="score-stats">
-        <div class="ss"><b id="rs-correct">0</b><small>To'g'ri / Правильно</small></div>
-        <div class="ss"><b id="rs-total">0</b><small>Jami / Всего</small></div>
-        <div class="ss"><b id="rs-time">00:00</b><small>Vaqt / Время</small></div>
+      <div class="eb-progress">
+        <div class="eb-track">
+          <div class="eb-fill" id="bar-fill"></div>
+        </div>
       </div>
-    </div>
-    <div class="res-actions">
-      <button class="btn-cert" id="btn-cert" onclick="openCert()">📄 Sertifikat / Сертификат</button>
-      <button class="btn-primary" onclick="location.reload()">Boshqa test / Новый тест</button>
-    </div>
-    <div class="rev-tabs" id="review-tabs"></div>
-    <div id="review-area"></div>
-  </div>
-</section>
+      <div class="eb-right">
+        <span class="eb-user" id="user-lbl"></span>
+        <span class="eb-timer" id="timer-t">00:00</span>
+      </div>
+    </header>
+    <main class="exam-stage">
+      <div class="q-card" id="q-card">
+        <div class="q-top">
+          <span class="q-tag" id="q-tag"></span>
+          <span class="q-num" id="q-num"></span>
+        </div>
+        <p class="q-inst" id="q-sub"></p>
+        <h2 class="q-title" id="q-title"></h2>
+        <div id="q-body"></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-ghost" id="nav-prev" disabled>&#8592; Oldingi / Назад</button>
+        <button class="btn-primary" id="nav-next">Keyingi / Далее &#8594;</button>
+        <button class="btn-submit" id="nav-submit" hidden>Topshirish / Сдать</button>
+      </div>
+    </main>
+    <footer class="dots-bar" id="dots-bar"></footer>
+  </section>
 
-<script src="{% static 'js/app.js' %}"></script>
+  <!-- ═══ 5. RESULTS ═══ -->
+  <section id="v-results" class="scene">
+    <div class="res-wrap">
+      <div class="res-header">
+        <img src="{% static 'images/logo.png' %}" alt="FE" class="res-logo-img">
+        <h1>Natijalar / <span class="ru">Результаты</span></h1>
+        <p id="res-name"></p>
+      </div>
+      <div class="score-card">
+        <div class="ring" id="ring">
+          <span class="ring-val" id="ring-val">0%</span>
+          <span class="ring-lbl">Ball / Балл</span>
+        </div>
+        <div class="score-stats">
+          <div class="ss"><b id="rs-correct">0</b><small>To'g'ri / Правильно</small></div>
+          <div class="ss"><b id="rs-total">0</b><small>Jami / Всего</small></div>
+          <div class="ss"><b id="rs-time">00:00</b><small>Vaqt / Время</small></div>
+        </div>
+      </div>
+      <div class="res-actions">
+        <button class="btn-cert" id="btn-cert" onclick="openCert()">📄 Sertifikat / Сертификат</button>
+        <button class="btn-primary" onclick="location.reload()">Boshqa test / Новый тест</button>
+      </div>
+      <div class="rev-tabs" id="review-tabs"></div>
+      <div id="review-area"></div>
+    </div>
+  </section>
+
+  <script>
+    // Load site settings (hero image, etc.)
+    (async function () {
+      try {
+        const r = await (await fetch('/api/site-settings/')).json();
+        if (r.success && r.hero_image_url) {
+          const el = document.querySelector('.register-left');
+          if (el) {
+            el.style.backgroundImage = 'url(' + r.hero_image_url + ')';
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+          }
+        }
+        if (r.success && r.logo_url) {
+          const logo = document.querySelector('.logo-img');
+          if (logo) logo.src = r.logo_url;
+        }
+      } catch (e) { }
+    })();
+  </script>
+  <script src="{% static 'js/app.js' %}"></script>
 </body>
+
 </html>

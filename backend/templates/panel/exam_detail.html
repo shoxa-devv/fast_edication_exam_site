@@ -1,48 +1,90 @@
 {% extends "panel/base.html" %}
-{% block title %}Exam Detail{% endblock %}
+{% block title %}Imtihon #{{ exam.pk }}{% endblock %}
 {% block content %}
-<div class="page-hd"><h1>Exam Detail</h1><a href="/admin/exams/" class="btn btn-sm btn-g">← Back</a></div>
-
-<div class="stats">
-  <div class="st"><div class="st-n">{{ exam.total_score|floatformat:0 }} / {{ exam.max_score|floatformat:0 }}</div><div class="st-l">Score</div></div>
-  <div class="st"><div class="st-n">{{ answers.count }}</div><div class="st-l">Answers</div></div>
-  <div class="st"><div class="st-n" style="color:{% if ai_usage.count > 0 %}#f87171{% else %}#34d399{% endif %}">{{ ai_usage.count }}</div><div class="st-l">AI Flagged</div></div>
+<div class="page-hd">
+  <h1>📝 Imtihon natijasi</h1>
+  <a href="/admin/exams/" class="btn btn-g">← Ortga</a>
 </div>
 
-<div style="font-size:16px;font-weight:700;margin-bottom:14px">Answers</div>
-<div class="tw" style="margin-bottom:28px">
-<table>
-<thead><tr><th>Category</th><th>Question</th><th>Answer</th><th>Result</th><th>Pts</th></tr></thead>
-<tbody>
-{% for a in answers %}
-<tr>
-  <td><span class="badge bg-blue">{{ a.question.category.name }}</span></td>
-  <td>{{ a.question.question_text|truncatechars:45 }}</td>
-  <td>{% if a.answer_index is not None %}Option {{ a.answer_index }}{% else %}{{ a.answer_text|truncatechars:35 }}{% endif %}</td>
-  <td>{% if a.is_correct %}<span class="badge bg-green">✓ Correct</span>{% elif a.is_correct == False %}<span class="badge bg-red">✗ Wrong</span>{% else %}<span class="badge bg-gray">Manual</span>{% endif %}</td>
-  <td>{{ a.points_earned|floatformat:0 }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+<div class="stats" style="max-width:700px">
+  <div class="st">
+    <div class="st-l">Talaba</div>
+    <div class="st-n" style="font-size:18px">{{ exam.student.full_name }}</div>
+  </div>
+  <div class="st">
+    <div class="st-l">O'qituvchi</div>
+    <div class="st-n" style="font-size:18px">{{ exam.student.teacher.full_name }}</div>
+  </div>
+  <div class="st">
+    <div class="st-l">Daraja / Oy</div>
+    <div class="st-n" style="font-size:18px">{{ exam.level.name }} — {{ exam.month.name }}</div>
+  </div>
+  <div class="st">
+    <div class="st-l">Ball</div>
+    <div class="st-n" style="font-size:18px">{{ exam.total_score|floatformat:0 }}/{{ exam.max_score|floatformat:0 }}
+    </div>
+  </div>
+  <div class="st">
+    <div class="st-l">Foiz</div>
+    <div class="st-n" style="font-size:18px">{{ exam.percentage }}%</div>
+  </div>
+  <div class="st">
+    <div class="st-l">Sana</div>
+    <div class="st-n" style="font-size:14px;color:#94a3b8">{{ exam.started_at|date:"d M Y, H:i" }}</div>
+  </div>
 </div>
 
-{% if ai_usage.count > 0 %}
-<div style="font-size:16px;font-weight:700;color:#f87171;margin-bottom:14px">⚠ AI Usage Detected</div>
-<div class="tw">
-<table>
-<thead><tr><th>Question</th><th>Confidence</th><th>Patterns</th><th>Snippet</th></tr></thead>
-<tbody>
-{% for ai in ai_usage %}
-<tr>
-  <td>{{ ai.question.question_text|truncatechars:35 }}</td>
-  <td><span class="badge bg-yellow">{{ ai.confidence_score|floatformat:1 }}%</span></td>
-  <td style="font-size:12px;color:#94a3b8">{{ ai.detected_patterns|join:", " }}</td>
-  <td style="max-width:250px;font-size:12px;color:#64748b">{{ ai.text_snippet|truncatechars:80 }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+{% if exam.is_completed %}
+<div style="margin-bottom:20px">
+  <a href="/certificate/{{ exam.session_id }}/" target="_blank" class="btn btn-p">📄 Sertifikat</a>
 </div>
 {% endif %}
+
+<div class="page-hd" style="margin-top:12px">
+  <h1 style="font-size:16px">Javoblar</h1>
+</div>
+<div class="tw">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Bo'lim</th>
+        <th>Turi</th>
+        <th>Savol</th>
+        <th>Javob</th>
+        <th>Natija</th>
+        <th>Ball</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ans in answers %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><span class="badge bg-blue" style="font-size:10px">{{ ans.question.category.name }}</span></td>
+        <td style="color:#64748b;font-size:12px">{{ ans.question.get_question_type_display }}</td>
+        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{
+          ans.question.question_text|truncatewords:12 }}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+          {% if ans.answer_index is not None and ans.question.options %}
+          {% with opts=ans.question.options idx=ans.answer_index %}
+          {{ opts|slice:":10" }}
+          {% endwith %}
+          {{ ans.answer_index }}
+          {% else %}
+          {{ ans.answer_text|truncatewords:10|default:"—" }}
+          {% endif %}
+        </td>
+        <td>
+          {% if ans.is_correct == True %}<span style="color:#34d399;font-weight:700;font-size:16px">✓</span>
+          {% elif ans.is_correct == False %}<span style="color:#f87171;font-weight:700;font-size:16px">✗</span>
+          {% else %}<span style="color:#64748b">—</span>{% endif %}
+        </td>
+        <td>{{ ans.points_earned|floatformat:0 }}</td>
+      </tr>
+      {% empty %}<tr>
+        <td colspan="7" class="empty">Javoblar yo'q</td>
+      </tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
