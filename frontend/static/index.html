@@ -16,6 +16,20 @@
 
 <body>
 
+  <!-- ═══ 0. LANGUAGE SELECTION ═══ -->
+  <div id="v-lang" class="lang-overlay">
+    <div class="lang-card">
+      <div class="lang-logo">
+        <img src="{% static 'images/logo.png' %}" alt="FE">
+      </div>
+      <h2>Tilni tanlang / <span class="ru">Выберите язык</span></h2>
+      <div class="lang-opts">
+        <button onclick="setLang('uz')">🇺🇿 O'zbek tili</button>
+        <button onclick="setLang('ru')">🇷🇺 Русский язык</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ 1. REGISTRATION ═══ -->
   <section id="v-register" class="scene active">
     <div class="register-page">
@@ -148,7 +162,21 @@
     <footer class="dots-bar" id="dots-bar"></footer>
   </section>
 
-  <!-- ═══ 5. RESULTS ═══ -->
+  <!-- ═══ 5. LOADING ANIMATION ═══ -->
+  <div id="v-loading-res" class="results-loading-overlay" hidden>
+    <div class="rl-content">
+      <div class="rl-circle-wrap">
+        <div class="rl-ring-outer"></div>
+        <div class="rl-circle">
+          <div class="rl-pct-center" id="rl-pct">0%</div>
+        </div>
+      </div>
+      <h3>Natijalarni hisoblayapmiz...</h3>
+      <p>Iltimos kutib turing</p>
+    </div>
+  </div>
+
+  <!-- ═══ 6. RESULTS ═══ -->
   <section id="v-results" class="scene">
     <div class="res-wrap">
       <div class="res-header">

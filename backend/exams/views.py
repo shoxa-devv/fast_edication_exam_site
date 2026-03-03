@@ -468,19 +468,14 @@ def certificate_view(request, session_id):
     else:
         band_score = 2.0
 
-    level_label = 'Beginner'
-    if band_score >= 8:
-        level_label = 'Expert'
-    elif band_score >= 7:
-        level_label = 'Advanced'
-    elif band_score >= 6:
-        level_label = 'Upper-Intermediate'
-    elif band_score >= 5:
-        level_label = 'Intermediate'
-    elif band_score >= 4:
-        level_label = 'Pre-Intermediate'
-    elif band_score >= 3:
-        level_label = 'Elementary'
+    # Calculate lesson progress
+    total_months = Level.objects.get(id=exam.level_id).months.count()
+    current_month_num = exam.month.number
+    # Each month is 10 lessons
+    lesson_progress = f"{current_month_num * 10}/{total_months * 10}"
+
+    level_label = exam.level.name
+    level_sub = lesson_progress
 
     return render(request, 'certificate.html', {
         'exam': exam,
@@ -491,6 +486,7 @@ def certificate_view(request, session_id):
         'percentage': pct,
         'band_score': band_score,
         'level_label': level_label,
+        'level_sub': level_sub,
         'logo_url': logo_url,
         'stamp_url': stamp_url,
         'answers': answers,

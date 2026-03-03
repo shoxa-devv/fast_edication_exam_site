@@ -10,6 +10,74 @@ let qi = 0, sec = 0, clock = null;
 let completedSections = new Set();
 let reviewData = null;
 let lastSessionId = null;
+let currentLang = 'uz';
+
+const UI = {
+  uz: {
+    start: "Boshlash",
+    loading: "Yuklanmoqda...",
+    back: "Ortga",
+    next: "Keyingi",
+    prev: "Oldingi",
+    submit: "Topshirish",
+    reg_title: "Ro'yxatdan o'tish",
+    reg_hint: "Imtihonni boshlash uchun ma'lumotlaringizni kiriting",
+    name: "Ism",
+    surname: "Familiya",
+    teacher: "O'qituvchi",
+    teacher_name: "O'qituvchi ismi",
+    pick_level: "Darajangizni tanlang",
+    pick_level_hint: "Mos darajani tanlang va testlarni boshlang",
+    pick_month: "Oy tanlang va testlarni boshlang",
+    month_stats: "savol",
+    word_stats: "so'z",
+    exam_submit_confirm: "Imtihonni topshirasizmi?",
+    results_title: "Natijalar",
+    score_lbl: "Ball",
+    correct_lbl: "To'g'ri",
+    total_lbl: "Jami",
+    time_lbl: "Vaqt",
+    new_test: "Boshqa test",
+    cert_btn: "Sertifikat",
+    calculating: "Natijalarni hisoblayapmiz...",
+    wait_hint: "Iltimos kutib turing",
+    no_answer: "Javob berilmadi",
+    correct_ans: "To'g'ri",
+    your_ans: "Javob",
+  },
+  ru: {
+    start: "Начать",
+    loading: "Загрузка...",
+    back: "Назад",
+    next: "Далее",
+    prev: "Назад",
+    submit: "Сдать",
+    reg_title: "Регистрация",
+    reg_hint: "Введите данные для начала экзамена",
+    name: "Имя",
+    surname: "Фамилия",
+    teacher: "Учитель",
+    teacher_name: "Имя учителя",
+    pick_level: "Выберите уровень",
+    pick_level_hint: "Выберите подходящий уровень и начните тесты",
+    pick_month: "Выберите месяц и начните тесты",
+    month_stats: "вопр.",
+    word_stats: "слов",
+    exam_submit_confirm: "Сдать экзамен?",
+    results_title: "Результаты",
+    score_lbl: "Балл",
+    correct_lbl: "Правильно",
+    total_lbl: "Всего",
+    time_lbl: "Время",
+    new_test: "Новый тест",
+    cert_btn: "Сертификат",
+    calculating: "Результаты рассчитываются...",
+    wait_hint: "Пожалуйста, подождите",
+    no_answer: "Нет ответа",
+    correct_ans: "Правильный",
+    your_ans: "Ответ",
+  }
+};
 
 const $ = id => document.getElementById(id);
 const show = el => { el.classList.add('active'); el.removeAttribute('hidden'); };
@@ -19,6 +87,51 @@ const swap = id => {
   const el = $(id);
   if (el) el.classList.add('active');
 };
+
+function setLang(lang) {
+  currentLang = lang;
+  updateUI();
+  hide($('v-lang'));
+}
+
+function updateUI() {
+  const t = UI[currentLang];
+  // Registration
+  document.querySelector('#v-register h2').innerHTML = `${t.reg_title} <span class="sub-ru">${currentLang === 'uz' ? 'Registration' : ''}</span>`;
+  document.querySelector('#v-register .form-hint').innerHTML = t.reg_hint;
+  document.querySelector('label[for=inp-first]').innerText = t.name + ' / Имя';
+  document.querySelector('label[for=inp-last]').innerText = t.surname + ' / Фамилия';
+  document.querySelector('label[for=inp-tfirst]').innerText = t.teacher_name + ' / Имя учителя';
+  document.querySelector('label[for=inp-tlast]').innerText = t.surname + ' / Фамилия';
+  document.querySelector('.form-sep').innerHTML = `${t.teacher} / <span class="ru">Учитель</span>`;
+  $('btn-register').querySelector('span').innerText = t.start;
+
+  // Levels
+  document.querySelector('#v-levels h1').innerText = t.pick_level;
+  document.querySelector('#v-levels p').innerText = t.pick_level_hint;
+  $('btn-back-levels').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg> ${t.back}`;
+
+  // Months
+  document.querySelector('#v-months p').innerText = t.pick_month;
+
+  // Exam
+  $('nav-prev').innerText = `← ${t.prev}`;
+  $('nav-next').innerText = `${t.next} →`;
+  $('nav-submit').innerText = t.submit;
+
+  // Results
+  document.querySelector('#v-results h1').innerText = t.results_title;
+  $('ring').querySelector('.ring-lbl').innerText = t.score_lbl;
+  document.querySelector('#rs-correct').nextElementSibling.innerText = t.correct_lbl;
+  document.querySelector('#rs-total').nextElementSibling.innerText = t.total_lbl;
+  document.querySelector('#rs-time').nextElementSibling.innerText = t.time_lbl;
+  $('btn-cert').innerText = `📄 ${t.cert_btn}`;
+  document.querySelector('button[onclick="location.reload()"]').innerText = t.new_test;
+
+  // Loading
+  document.querySelector('#v-loading-res h3').innerText = t.calculating;
+  document.querySelector('#v-loading-res p').innerText = t.wait_hint;
+}
 
 /* ═══ Boot ═══ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,16 +172,16 @@ async function doRegister() {
     });
     const text = await resp.text();
     let r;
-    try { r = JSON.parse(text); } catch { r = { success: false, error: 'Server javob bermadi. BACKEND_URL o\'rnatilganmi? Netlify → Site configuration → Environment variables → BACKEND_URL = Django sayt manzili.' }; }
+    try { r = JSON.parse(text); } catch { r = { success: false, error: 'Server error' }; }
     if (r.success) {
       studentId = r.student_id;
       studentName = r.student_name;
       teacherName = r.teacher_name;
       await loadLevels();
     } else {
-      alert(r.error || 'Xatolik yuz berdi / Произошла ошибка');
+      alert(r.error || 'Xatolik / Ошибка');
       $('btn-register').disabled = false;
-      $('btn-register').innerHTML = "Boshlash / Начать";
+      $('btn-register').querySelector('span').innerText = UI[currentLang].start;
     }
   } catch (e) {
     alert('Server bilan bog\'lanib bo\'lmadi / Ошибка соединения.\n\nNetlify: BACKEND_URL o\'rnating (Django sayt manzili).\nYoki Django backendni Railway/Render da ishga tushiring.');
@@ -108,7 +221,7 @@ function renderLevels() {
         <div class="lc-name">${lv.name}</div>
         <div class="lc-desc">${lv.description || ''}</div>
         <div class="lc-footer">
-          <span class="lc-meta">${lv.month_count} oy / мес.</span>
+          <span class="lc-meta">${lv.month_count} ${currentLang === 'uz' ? 'oy' : 'мес.'}</span>
           <span class="lc-arrow">&rarr;</span>
         </div>
       </div>
@@ -147,10 +260,10 @@ function renderMonths(levelInfo, months) {
       <div class="mc-num">${m.number}</div>
       <div class="mc-name">${m.name}</div>
       <div class="mc-stats">
-        <span><b>${m.question_count}</b> savol / вопр.</span>
-        <span><b>${m.vocab_count}</b> so'z / слов</span>
+        <span><b>${m.question_count}</b> ${UI[currentLang].month_stats}</span>
+        <span><b>${m.vocab_count}</b> ${UI[currentLang].word_stats}</span>
       </div>
-      <div class="mc-btn">Boshlash / Начать</div>
+      <div class="mc-btn">${UI[currentLang].start}</div>
     `;
     card.addEventListener('click', () => startExam(m));
     grid.appendChild(card);
@@ -177,7 +290,8 @@ async function startExam(month) {
     reviewData = null;
 
     swap('v-exam');
-    $('exam-badge').textContent = `${currentLevel.name} — ${month.name}`;
+    const monthLabel = month.name.includes(month.number) ? month.name : `${month.number}-oy`;
+    $('exam-badge').textContent = `${currentLevel.name} — ${monthLabel}`;
     $('user-lbl').textContent = studentName;
     buildDots();
     go(0);
@@ -233,8 +347,9 @@ function handleNext() {
   const nxt = qs[ni];
 
   if (cur.category !== nxt.category) {
-    completedSections.add(cur.category);
-    showSectionComplete(cur.category_name, nxt);
+    // completedSections.add(cur.category); // Option to skip overlay
+    // showSectionComplete(cur.category_name, nxt);
+    go(ni);
   } else {
     go(ni);
   }
@@ -298,10 +413,6 @@ function go(i) {
   if (isLastOverall) {
     $('nav-next').hidden = true;
     $('nav-submit').hidden = false;
-  } else if (isLastInSection) {
-    $('nav-next').hidden = false;
-    $('nav-next').textContent = "Tugatish / Завершить \u2192";
-    $('nav-submit').hidden = true;
   } else {
     $('nav-next').hidden = false;
     $('nav-next').textContent = 'Keyingi / Далее \u2192';
@@ -448,7 +559,29 @@ async function submitExam() {
       clearInterval(clock);
       reviewData = r.review || [];
       lastSessionId = r.session_id || null;
-      showResults(r);
+
+      // SHOW ANIMATION FOR 2 SECONDS
+      hide($('v-exam'));
+      show($('v-loading-res'));
+
+      let progress = 0;
+      const duration = 2000; // 2 seconds total
+      const interval = 20;   // Update every 20ms
+      const steps = duration / interval;
+      const increment = 100 / steps;
+
+      const counter = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(counter);
+          setTimeout(() => {
+            hide($('v-loading-res'));
+            showResults(r);
+          }, 200); // 0.2s pause at 100%
+        }
+        $('rl-pct').textContent = Math.round(progress) + '%';
+      }, interval);
     } else {
       alert('Xatolik / Ошибка: ' + (r.error || ''));
       $('nav-submit').disabled = false;
@@ -464,8 +597,8 @@ async function submitExam() {
 /* ═══ Results ═══ */
 function showResults(d) {
   swap('v-results');
-  $('res-name').textContent =
-    `${studentName} — ${currentLevel.name} / ${currentMonth.name}`;
+  const monthLabel = currentMonth.name.includes(currentMonth.number) ? currentMonth.name : `${currentMonth.number}-oy`;
+  $('res-name').textContent = `${studentName} — ${currentLevel.name} / ${monthLabel}`;
 
   const s = d.score || {};
   const correct = s.correct || 0, total = s.total || 0;
@@ -512,8 +645,8 @@ function showResults(d) {
           ansHtml += `<p class="rev-ans"><b>To'g'ri / Правильный:</b> <span class="rev-ok">${item.correctAnswer || ''}</span></p>`;
         }
       } else {
-        const preview = (item.yourAnswer || 'Javob berilmadi / Нет ответа').substring(0, 300);
-        ansHtml = `<p class="rev-ans"><b>Javob / Ответ:</b> <span style="color:var(--g700)">${preview}${preview.length >= 300 ? '...' : ''}</span></p>`;
+        const fullText = item.yourAnswer || UI[currentLang].no_answer;
+        ansHtml = `<p class="rev-ans"><b>${UI[currentLang].your_ans}:</b> <span style="color:var(--g700)">${fullText}</span></p>`;
         if (item.aiCheck && item.aiCheck.score >= 40) {
           const ac = item.aiCheck;
           const acCls = ac.score >= 70 ? 'ai-high' : 'ai-mid';

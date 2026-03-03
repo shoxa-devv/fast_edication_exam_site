@@ -12,6 +12,7 @@ python manage.py makemigrations --noinput 2>&1 | tail -3
 python manage.py migrate --run-syncdb 2>&1 | tail -3
 
 echo "  Collecting static files..."
+rm -rf staticfiles/*
 python manage.py collectstatic --noinput 2>&1 | tail -1
 
 echo "  Setting up data..."
@@ -36,18 +37,31 @@ sleep 2
 
 echo "  Starting public tunnel..."
 TUNNEL_LOG="/tmp/cloudflared_output.log"
-# Start cloudflared in background
-$CLOUDFLARED tunnel --url "http://localhost:$PORT" > "$TUNNEL_LOG" 2>&1 &
+# Start cloudflared in background with retry logic
+(
+  for i in $(seq 1 5); do
+    echo "  Attempt $i to start tunnel..."
+    $CLOUDFLARED tunnel --url "http://localhost:$PORT" > "$TUNNEL_LOG" 2>&1
+    echo "  Tunnel command exited, retrying in 5s..."
+    sleep 5
+  done
+) &
 TUNNEL_PID=$!
 
 # Wait for URL - improve parsing to avoid 'api.trycloudflare.com'
 PUBLIC_URL=""
-echo "  Waiting for public URL..."
-for i in $(seq 1 30); do
+echo "  Waiting for public URL (may take a minute)..."
+# Increase timeout to 60 seconds for slower networks
+for i in $(seq 1 60); do
     sleep 1
-    # Find the link that is NOT api.trycloudflare.com
-    PUBLIC_URL=$(grep -oP 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' "$TUNNEL_LOG" 2>/dev/null | grep -v "api.trycloudflare.com" | head -1)
+    # Find the link that is NOT api.trycloudflare.com - use a broader match and then filter
+    PUBLIC_URL=$(grep -o "https://[a-zA-Z0-9.-]*.trycloudflare.com" "$TUNNEL_LOG" 2>/dev/null | grep -v "api.trycloudflare.com" | tail -n 1)
     if [ -n "$PUBLIC_URL" ]; then
+        break
+    fi
+    # If tunnel process died, stop waiting
+    if ! kill -0 $TUNNEL_PID 2>/dev/null; then
+        echo "  ! Tunnel process died."
         break
     fi
 done
