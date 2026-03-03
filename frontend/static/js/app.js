@@ -69,6 +69,11 @@ const UI = {
     network_error: "Server bilan bog'lanib bo'lmadi",
     month_label: "oy",
     select_language: "Tilni tanlang",
+    nav_title: "Navigatsiya",
+    nav_restart: "Bosh sahifaga qaytish",
+    nav_restart_desc: "Testni boshidan boshlash (holat o'chiriladi)",
+    nav_back: "Bitta sahifa orqaga qaytish",
+    nav_back_desc: "Oldingi bosqichga qaytish",
   },
   ru: {
     start: "Начать",
@@ -122,6 +127,11 @@ const UI = {
     network_error: "Ошибка соединения с сервером",
     month_label: "мес.",
     select_language: "Выберите язык",
+    nav_title: "Навигация",
+    nav_restart: "Вернуться на главную",
+    nav_restart_desc: "Начать тест заново (прогресс будет удален)",
+    nav_back: "Вернуться на одну страницу назад",
+    nav_back_desc: "Перейти к предыдущему шагу",
   },
   en: {
     start: "Start",
@@ -175,6 +185,11 @@ const UI = {
     network_error: "Could not connect to server",
     month_label: "months",
     select_language: "Select language",
+    nav_title: "Navigation",
+    nav_restart: "Return to Home Page",
+    nav_restart_desc: "Start test from scratch (state will be cleared)",
+    nav_back: "Go back one page",
+    nav_back_desc: "Return to the previous step",
   }
 };
 
@@ -297,6 +312,16 @@ function updateUI() {
   $('btn-cert').innerText = `📄 ${t.cert_btn}`;
   document.querySelector('button[onclick="location.reload()"]').innerText = t.new_test;
 
+  // Nav Modal
+  const vNav = $('v-nav-modal');
+  if (vNav) {
+    vNav.querySelector('#nav-modal-title').innerText = t.nav_title;
+    vNav.querySelector('#nav-restart-title').innerText = t.nav_restart;
+    vNav.querySelector('#nav-restart-desc').innerText = t.nav_restart_desc;
+    vNav.querySelector('#nav-back-title').innerText = t.nav_back;
+    vNav.querySelector('#nav-back-desc').innerText = t.nav_back_desc;
+  }
+
   // Loading
   const vLoad = $('v-loading-res');
   if (vLoad) {
@@ -339,6 +364,28 @@ document.addEventListener('DOMContentLoaded', () => {
   $('nav-prev').addEventListener('click', () => { if (qi > 0) go(qi - 1); });
   $('nav-submit').addEventListener('click', () => {
     if (confirm(UI[currentLang].exam_submit_confirm)) submitExam();
+  });
+
+  // Nav Modal Listeners
+  $('btn-nav-restart').addEventListener('click', () => {
+    if (confirm(UI[currentLang].nav_restart_desc)) {
+      localStorage.removeItem('fe_state');
+      location.reload();
+    }
+  });
+
+  $('btn-nav-back').addEventListener('click', () => {
+    const activeScene = document.querySelector('.scene.active')?.id;
+    if (activeScene === 'v-exam') {
+      swap('v-months');
+    } else if (activeScene === 'v-months') {
+      swap('v-levels');
+    } else if (activeScene === 'v-levels') {
+      localStorage.removeItem('fe_state');
+      location.reload();
+    }
+    hide($('v-nav-modal'));
+    saveState();
   });
 });
 

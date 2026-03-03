@@ -15,7 +15,7 @@
 </head>
 
 <body>
-#fuck
+
   <!-- ═══ 0. LANGUAGE SELECTION ═══ -->
   <div id="v-lang" class="lang-overlay">
     <div class="lang-card">
@@ -98,7 +98,15 @@
   <!-- ═══ 2. LEVEL SELECTION ═══ -->
   <section id="v-levels" class="scene">
     <nav class="top-nav">
-      <div class="nav-brand">Fast Education</div>
+      <div class="eb-left">
+        <button class="nav-home-btn" onclick="show($('v-nav-modal'))">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </button>
+        <div class="nav-brand">Fast Education</div>
+      </div>
       <div class="nav-right-group">
         <div class="lang-switcher">
           <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -126,7 +134,15 @@
   <!-- ═══ 3. MONTH SELECTION ═══ -->
   <section id="v-months" class="scene">
     <nav class="top-nav">
-      <div class="nav-brand">Fast Education</div>
+      <div class="eb-left">
+        <button class="nav-home-btn" onclick="show($('v-nav-modal'))">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </button>
+        <div class="nav-brand">Fast Education</div>
+      </div>
       <div class="nav-right-group">
         <div class="lang-switcher">
           <button class="lang-switcher-current">🇺🇿 O'zbek <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -165,6 +181,12 @@
   <section id="v-exam" class="scene">
     <header class="exam-bar">
       <div class="eb-left">
+        <button class="nav-home-btn" onclick="show($('v-nav-modal'))">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </button>
         <div class="eb-brand">Fast Education</div>
         <span class="eb-badge" id="exam-badge"></span>
       </div>
@@ -270,6 +292,32 @@
       } catch (e) { }
     })();
   </script>
+  <!-- ═══ 7. NAVIGATION MODAL ═══ -->
+  <div id="v-nav-modal" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="nav-modal-title">Navigatsiya</h2>
+        <button class="modal-close" onclick="hide($('v-nav-modal'))">&times;</button>
+      </div>
+      <div class="nav-modal-options">
+        <button class="nav-opt-btn" id="btn-nav-restart">
+          <div class="nav-opt-icon">🔄</div>
+          <div class="nav-opt-text">
+            <b id="nav-restart-title">Bosh sahifaga qaytish</b>
+            <span id="nav-restart-desc">Testni boshidan boshlash (holat o'chiriladi)</span>
+          </div>
+        </button>
+        <button class="nav-opt-btn" id="btn-nav-back">
+          <div class="nav-opt-icon">⬅️</div>
+          <div class="nav-opt-text">
+            <b id="nav-back-title">Bitta sahifa orqaga qaytish</b>
+            <span id="nav-back-desc">Oldingi bosqichga qaytish</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 
